@@ -8,6 +8,9 @@ REMOTE_DIR="/srv/www/mbbb/"
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
+echo "Building gigs and testimonials content..."
+npm run content:build
+
 if ! ssh -O check "$REMOTE" >/dev/null 2>&1; then
     echo "No active SSH connection for '$REMOTE'."
     echo
@@ -31,6 +34,13 @@ rsync -avz \
     --exclude 'page-template.html' \
     --exclude='server/' \
     --exclude='*.env' \
+    --exclude 'node_modules/' \
+    --exclude 'scripts/' \
+    --exclude '.content-build/' \
+    --exclude 'package.json' \
+    --exclude 'package-lock.json' \
+    --exclude '.pages.yml' \
+    --exclude '.github/' \
     --exclude='__pycache__/' \
     ./ "$REMOTE:$REMOTE_DIR"
 
