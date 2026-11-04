@@ -1,11 +1,7 @@
-title: "Bretwood Theatre Spring Concert"
-date: "2027-03-21"
-start_time: "3pm"
-venue: "Brentwood Theatre"
-location: "Brentwood Theatre, 1-3 Shenfield Road, Brentwood, Essex CM15 8NE"
-running_time: "2 hours, including 20 min interval"
-description: |- 
-  
-ticket_url: ""
-ticket_price: ""
+title: Bretwood Theatre Spring Concert
+date: 2027-03-21
+start_time: 15:00
+venue: Brentwood Theatre
+location: Brentwood Theatre, 1-3 Shenfield Road, Brentwood, Essex CM15 8NE
+running_time: 2 hours, including 20 min interval
 published: true
