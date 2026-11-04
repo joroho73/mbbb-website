@@ -4,8 +4,9 @@ async function loadTestimonials() {
 
   try {
     // Read the list of YAML filenames.
+    const contentBase = await window.getContentBase();
     const manifestResponse = await fetch(
-      "/testimonials/testimonials.json"
+      `${contentBase}/testimonials/testimonials.json`
     );
 
     if (!manifestResponse.ok) {
@@ -27,7 +28,7 @@ async function loadTestimonials() {
     const reviews = await Promise.all(
       filenames.map(async (filename) => {
         const response = await fetch(
-          `/testimonials/${encodeURIComponent(filename)}`
+          `${contentBase}/testimonials/${encodeURIComponent(filename)}`
         );
 
         if (!response.ok) {

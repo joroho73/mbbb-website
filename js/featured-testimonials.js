@@ -10,7 +10,10 @@ async function loadFeaturedTestimonials() {
   const pauseButton = document.querySelector("#testimonial-pause");
 
   try {
-    const manifestResponse = await fetch("/testimonials/testimonials.json");
+    const contentBase = await window.getContentBase();
+    const manifestResponse = await fetch(
+      `${contentBase}/testimonials/testimonials.json`
+    );
 
     if (!manifestResponse.ok) {
       throw new Error(`Could not load manifest: ${manifestResponse.status}`);
@@ -28,7 +31,7 @@ async function loadFeaturedTestimonials() {
     const records = await Promise.all(
       filenames.map(async (filename) => {
         const response = await fetch(
-          `/testimonials/${encodeURIComponent(filename)}`
+          `${contentBase}/testimonials/${encodeURIComponent(filename)}`
         );
 
         if (!response.ok) {

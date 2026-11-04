@@ -1,85 +1,104 @@
 <!doctype html>
 <html lang="en">
-<head>
-  
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Melvin Beddow Big Band">
-  
-  <title>Gigs | Melvin Beddow Big Band</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Melvin Beddow Big Band" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/png" href="/assets/favicon/favicon-96x96.png" sizes="96x96" />
-  <link rel="icon" type="image/svg+xml" href="/assets/favicon/favicon.svg" />
-  <link rel="shortcut icon" href="/assets/favicon/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png" />
-  <link rel="manifest" href="/assets/favicon/site.webmanifest" />
+    <title>Gigs | Melvin Beddow Big Band</title>
 
-  <link rel="stylesheet" href="/css/styles.css">
-  <link rel="stylesheet" href="/css/gigs.css">
-  <link rel="stylesheet" href="/css/menu-styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="/assets/favicon/favicon-96x96.png"
+      sizes="96x96"
+    />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon/favicon.svg" />
+    <link rel="shortcut icon" href="/assets/favicon/favicon.ico" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/assets/favicon/apple-touch-icon.png"
+    />
+    <link rel="manifest" href="/assets/favicon/site.webmanifest" />
 
-  <script defer src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.1/dist/js-yaml.min.js"></script>
-  <script defer src="/js/gigs.js"></script>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/gigs.css" />
+    <link rel="stylesheet" href="/css/menu-styles.css" />
 
-</head>
-<body id="top" class="gigs-listing-page">
-  <div id="site-header"></div>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.1/dist/js-yaml.min.js"
+    ></script>
+    <script defer src="/js/content-source.js"></script>
+    <script defer src="/js/gigs.js"></script>
+  </head>
+  <body id="top" class="gigs-listing-page">
+    <div id="site-header"></div>
 
-  <main id="main-content">
+    <main id="main-content">
+      <section class="page-header" aria-labelledby="page-title">
+        <p class="eyebrow">Where to catch us</p>
+        <h1 id="page-title">Gigs</h1>
+        <p class="page-intro">
+          Come and see the Melvin Beddow Big Band live at one of our upcoming
+          performances.
+        </p>
+      </section>
 
-    <section class="page-header" aria-labelledby="page-title">
-      <p class="eyebrow">Where to catch us</p>
-      <h1 id="page-title">Gigs</h1>
-      <p class="page-intro">
-        Come and see the Melvin Beddow Big Band live at one of our
-        upcoming performances.
-      </p>
-    </section>
+      <hr class="page-divider" />
 
-    <hr class="page-divider">
+      <section class="gigs" aria-labelledby="upcoming-title">
+        <div class="gigs-intro">
+          <p class="eyebrow">Coming up</p>
+          <h2 class="section-title section-title--compact" id="upcoming-title">
+            Upcoming
+            <br />
+            <em>performances.</em>
+          </h2>
+        </div>
 
-    <section class="gigs" aria-labelledby="upcoming-title">
-      <div class="gigs-intro">
-        <p class="eyebrow">Coming up</p>
-        <h2 class="section-title section-title--compact" id="upcoming-title">
-          Upcoming<br><em>performances.</em>
-        </h2>
-      </div>
+        <div class="gig-list" id="upcoming-gigs">
+          <p>Loading upcoming performances…</p>
+        </div>
+      </section>
 
-      <div class="gig-list" id="upcoming-gigs">
-        <p>Loading upcoming performances…</p>
-      </div>
-    </section>
+      <hr class="page-divider-white" />
 
-    <hr class="page-divider-white">
+      <section class="gigs" aria-labelledby="past-title">
+        <div class="gigs-intro">
+          <p class="eyebrow">From the archive</p>
+          <h2 class="section-title section-title--compact" id="past-title">
+            Past
+            <br />
+            <em>performances.</em>
+          </h2>
+        </div>
 
-    <section class="gigs" aria-labelledby="past-title">
-      <div class="gigs-intro">
-        <p class="eyebrow">From the archive</p>
-        <h2 class="section-title section-title--compact" id="past-title">
-          Past<br><em>performances.</em>
-        </h2>
-      </div>
+        <div class="gig-list" id="past-gigs">
+          <p>Loading past performances…</p>
+        </div>
+      </section>
 
-      <div class="gig-list" id="past-gigs">
-        <p>Loading past performances…</p>
-      </div>
-    </section>
+      <noscript>
+        <p class="page-content">
+          Please enable JavaScript to view performance listings, or
+          <a href="mailto:enquiries@mbbb.co.uk">
+            contact us for upcoming dates
+          </a>
+          .
+        </p>
+      </noscript>
+    </main>
 
-    <noscript>
-      <p class="page-content">
-        Please enable JavaScript to view performance listings, or
-        <a href="mailto:enquiries@mbbb.co.uk">contact us for upcoming dates</a>.
-      </p>
-    </noscript>
+    <div id="site-footer"></div>
 
-  </main>
-
-  <div id="site-footer"></div>
-
-  <script src="/js/includes.js"></script>
-</body>
+    <script src="/js/includes.js"></script>
+  </body>
 </html>

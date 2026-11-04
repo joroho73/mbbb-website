@@ -1,0 +1,152 @@
+#!/usr/bin/python3 -I
+"""Restricted SSH receiver. YAML schema validation runs in the content builder.
+
+SSH command: check | publish
+publish stdin: UTF-8 JSON {version:1, commit:<40 hex>, sequence:<positive int>,
+                         files:{"gigs/gigs.json":<text>, ...}}
+Only the two manifests and the YAML files they list are accepted.
+"""
+import fcntl
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import signal
+import sys
+import tempfile
+
+ROOT = Path('/srv/mbbb-content')
+MAX_UPLOAD = 10 * 1024 * 1024
+MAX_FILE = 512 * 1024
+PATTERNS = {
+    'gigs': re.compile(r'[A-Za-z0-9][A-Za-z0-9_-]*\.ya?ml', re.I),
+    'testimonials': re.compile(r'[A-Za-z0-9][A-Za-z0-9_ &-]*\.ya?ml', re.I),
+}
+
+
+def require(condition, message):
+    if not condition:
+        raise ValueError(message)
+
+
+def unique_object(pairs):
+    result = {}
+    for key, value in pairs:
+        require(key not in result, 'Duplicate JSON key')
+        result[key] = value
+    return result
+
+
+def parse_json(text):
+    return json.loads(text, object_pairs_hook=unique_object)
+
+
+def validate(raw):
+    require(len(raw) <= MAX_UPLOAD, 'Upload exceeds 10 MiB')
+    bundle = parse_json(raw.decode('utf-8'))
+    require(isinstance(bundle, dict), 'Expected a JSON object')
+    require(set(bundle) == {'version', 'commit', 'sequence', 'files'}, 'Unexpected bundle fields')
+    require(type(bundle['version']) is int and bundle['version'] == 1, 'Unsupported version')
+    require(isinstance(bundle['commit'], str) and re.fullmatch(r'[0-9a-f]{40}', bundle['commit']), 'Invalid commit')
+    require(type(bundle['sequence']) is int and 0 < bundle['sequence'] < 10**15, 'Invalid sequence')
+    files = bundle['files']
+    require(isinstance(files, dict) and 2 <= len(files) <= 2002, 'Invalid file count')
+    expected = set()
+    for collection, pattern in PATTERNS.items():
+        manifest = f'{collection}/{collection}.json'
+        require(manifest in files and isinstance(files[manifest], str), 'Missing manifest: ' + manifest)
+        names = parse_json(files[manifest])
+        require(isinstance(names, list) and len(names) <= 1000, 'Invalid manifest')
+        seen = set()
+        anchors = set()
+        expected.add(manifest)
+        for name in names:
+            require(isinstance(name, str) and len(name) <= 200 and pattern.fullmatch(name), 'Invalid YAML filename')
+            anchor = name.rsplit('.', 1)[0]
+            require(name not in seen and anchor not in anchors, 'Duplicate filename or anchor')
+            seen.add(name)
+            anchors.add(anchor)
+            expected.add(f'{collection}/{name}')
+    require(set(files) == expected, 'Files must exactly match both manifests')
+    for name, content in files.items():
+        require(isinstance(content, str) and content.strip() and '\x00' not in content, 'Invalid file text: ' + name)
+        require(len(content.encode('utf-8')) <= MAX_FILE, 'File exceeds 512 KiB: ' + name)
+    canonical = json.dumps(files, sort_keys=True, ensure_ascii=True, separators=(',', ':')).encode('ascii')
+    digest = hashlib.sha256(canonical).hexdigest()
+    return bundle, digest
+
+
+def publish(raw, root=ROOT):
+    bundle, digest = validate(raw)
+    require(root.is_dir(), 'Content directory does not exist')
+    with (root / '.publish.lock').open('a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        releases = root / 'releases'
+        releases.mkdir(mode=0o755, exist_ok=True)
+        current = root / 'current'
+        if current.is_symlink():
+            old = parse_json((current / 'release.json').read_text(encoding='utf-8'))
+            require(bundle['sequence'] >= old['sequence'], 'Older publication rejected')
+            if bundle['sequence'] == old['sequence']:
+                require(bundle['commit'] == old['commit'] and digest == old['digest'], 'Sequence already used for different content')
+                return 'Already published: ' + old['release']
+        else:
+            require(not current.exists(), 'Current path must be a symlink')
+        release = f"{bundle['sequence']}-{bundle['commit']}"
+        destination = releases / release
+        metadata = {'release': release, 'commit': bundle['commit'], 'sequence': bundle['sequence'], 'digest': digest}
+        stage = Path(tempfile.mkdtemp(prefix='.upload-', dir=root))
+        pointer = stage / 'current-link'
+        try:
+            # mkdtemp is private until every file is complete.
+            for collection in PATTERNS:
+                (stage / collection).mkdir(mode=0o755)
+            for name, content in bundle['files'].items():
+                target = stage / name
+                with target.open('x', encoding='utf-8', newline='') as output:
+                    output.write(content)
+                    output.flush()
+                    os.fsync(output.fileno())
+                target.chmod(0o644)
+            (stage / 'release.json').write_text(json.dumps(metadata) + '\n', encoding='utf-8')
+            (stage / 'release.json').chmod(0o644)
+            if destination.exists():
+                # A completed upload may remain after interruption before activation.
+                require(not destination.is_symlink(), 'Invalid release directory')
+                require(parse_json((destination / 'release.json').read_text()) == metadata, 'Release already exists with different content')
+                for name, content in bundle['files'].items():
+                    require((destination / name).read_bytes() == content.encode('utf-8'), 'Existing release is incomplete')
+            else:
+                stage.chmod(0o755)
+                stage.rename(destination)
+                stage = Path(tempfile.mkdtemp(prefix='.activate-', dir=root))
+                pointer = stage / 'current-link'
+            pointer.symlink_to('releases/' + release)
+            # One rename switches both collections together. Retain old releases.
+            os.replace(pointer, current)
+        finally:
+            shutil.rmtree(stage, ignore_errors=True)
+        return 'Published: ' + release
+
+
+def main():
+    os.umask(0o022)
+    signal.alarm(120)
+    command = os.environ.get('SSH_ORIGINAL_COMMAND', '')
+    if command == 'check':
+        require(ROOT.is_dir() and os.access(ROOT, os.W_OK | os.X_OK), 'Content directory is not writable')
+        print('MBBB content receiver ready (protocol 1). No content changed.')
+    elif command == 'publish':
+        print(publish(sys.stdin.buffer.read(MAX_UPLOAD + 1)))
+    else:
+        raise ValueError('Only check and publish commands are allowed')
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except (ValueError, OSError) as error:
+        print('Publication rejected: ' + str(error), file=sys.stderr)
+        sys.exit(1)

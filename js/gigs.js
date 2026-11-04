@@ -124,7 +124,11 @@
       throw new Error("The YAML parser has not loaded.");
     }
 
-    const filenames = await fetchFile("/gigs/gigs.json", "json");
+    const contentBase = await window.getContentBase();
+    const filenames = await fetchFile(
+      `${contentBase}/gigs/gigs.json`,
+      "json"
+    );
 
     if (
       !Array.isArray(filenames) ||
@@ -140,7 +144,7 @@
     const records = await Promise.all(
       filenames.map(async filename => {
         const yaml = await fetchFile(
-          `/gigs/${encodeURIComponent(filename)}`,
+          `${contentBase}/gigs/${encodeURIComponent(filename)}`,
           "text"
         );
 

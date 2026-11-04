@@ -23,25 +23,31 @@ echo "Deploying Melvin Beddow Big Band demo website..."
 
 rsync -avz \
     --delete \
-    --exclude '.git/' \
-    --exclude '.gitignore' \
-    --exclude '.vscode/' \
-    --exclude '*:Zone.Identifier' \
     --exclude '*.bak' \
-    --exclude 'deploy.sh' \
-    --exclude 'deploy-command.txt' \
-    --exclude 'README.md' \
-    --exclude 'page-template.html' \
-    --exclude='server/' \
-    --exclude='*.env' \
-    --exclude 'node_modules/' \
-    --exclude 'scripts/' \
+    --exclude '*.env' \
+    --exclude '*:Zone.Identifier' \
     --exclude '.content-build/' \
-    --exclude 'package.json' \
-    --exclude 'package-lock.json' \
-    --exclude '.pages.yml' \
+    --exclude '.git/' \
     --exclude '.github/' \
-    --exclude='__pycache__/' \
+    --exclude '.gitignore' \
+    --exclude '.pages.yml' \
+    --exclude '.vscode/' \
+    --exclude '/gigs/*.yaml' \
+    --exclude '/gigs/*.yml' \
+    --exclude '/gigs/gigs.json' \
+    --exclude '/testimonials/*.yaml' \
+    --exclude '/testimonials/*.yml' \
+    --exclude '/testimonials/testimonials.json' \
+    --exclude 'README.md' \
+    --exclude '__pycache__/' \
+    --exclude 'deploy-command.txt' \
+    --exclude 'deploy.sh' \
+    --exclude 'node_modules/' \
+    --exclude 'package-lock.json' \
+    --exclude 'package.json' \
+    --exclude 'page-template.html' \
+    --exclude 'scripts/' \
+    --exclude 'server/' \
     ./ "$REMOTE:$REMOTE_DIR"
 
 echo
