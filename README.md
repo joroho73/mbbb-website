@@ -8,7 +8,7 @@ Last updated: 21 October 2026.
 
 | Item | Details |
 | --- | --- |
-| Repository | https://github.com/joroho73/mbbb-demo-website |
+| Repository | https://github.com/joroho73/mbbb-website |
 | Working branch | `main` — currently maintained by one developer |
 | Demo website | https://mbbb.dcsmail.uk |
 | Demo hosting | Mythic Beasts VPS, Ubuntu 24.04, Caddy |
