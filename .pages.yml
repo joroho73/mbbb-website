@@ -1,0 +1,126 @@
+content:
+  - name: gigs
+    label: Gigs
+    type: collection
+    path: gigs
+    format: yaml
+    subfolders: false
+    filename: "{fields.date}-{fields.title}.yml"
+
+    exclude:
+      - "*.html"
+      - "*.json"
+
+    view:
+      primary: title
+      sort: date
+      order: asc
+
+    fields:
+      - name: title
+        label: Gig title
+        type: string
+        required: true
+
+      - name: date
+        label: Performance date
+        type: date
+        required: true
+        default: ""
+        options:
+          format: yyyy-MM-dd
+
+      - name: start_time
+        label: Start time
+        type: string
+        required: true
+        description: "For example: 3pm, or Doors 7pm · Music 7.30pm."
+
+      - name: venue
+        label: Venue
+        type: string
+        required: true
+
+      - name: location
+        label: Address
+        type: string
+        description: "Include the postcode. Used for the Google Maps link."
+
+      - name: running_time
+        label: Running time
+        type: string
+        description: "For example: 2 hours, including a 20-minute interval."
+
+      - name: description
+        label: Description
+        type: text
+        description: "Leave a blank line between paragraphs."
+
+      - name: ticket_url
+        label: Ticket booking link
+        type: string
+        description: "Paste the complete https:// address, or leave blank."
+
+      - name: ticket_price
+        label: Ticket price
+        type: string
+        description: "Include any booking fees or different ticket prices."
+
+      - name: published
+        label: Published
+        type: boolean
+        default: false
+        description: "Switch on when this gig is ready to appear on the website."
+
+  - name: testimonials
+    label: Testimonials
+    type: collection
+    path: testimonials
+    format: yaml
+    subfolders: false
+    filename: "{fields.date}-{fields.reviewer}.yml"
+
+    exclude:
+      - "*.html"
+      - "*.json"
+
+    view:
+      primary: reviewer
+      sort: date
+      order: desc
+
+    fields:
+      - name: reviewer
+        label: Reviewer
+        type: string
+        required: true
+
+      - name: review_text
+        label: Testimonial
+        type: text
+        required: true
+        description: "Leave a blank line between paragraphs."
+
+      - name: date
+        label: Date
+        type: date
+        required: true
+        description: "Use the review date if known; otherwise use the date you add it."
+        options:
+          format: yyyy-MM-dd
+
+      - name: source
+        label: Event type or source
+        type: string
+        description: "For example: Wedding, Concert or Private celebration."
+
+      - name: featured
+        label: Featured on homepage
+        type: boolean
+        default: false
+
+      - name: published
+        label: Published
+        type: boolean
+        default: false
+        description: "Switch on when this testimonial is ready to appear on the website."
