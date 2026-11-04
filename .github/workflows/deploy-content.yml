@@ -1,0 +1,177 @@
+name: Publish CMS content
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mbbb-content-publication
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Test content builder
+        run: npm run content:test
+
+      - name: Validate and stage published content
+        run: |
+          mkdir -p .content-build
+          npm run content:build -- --stage .content-build/release
+
+      - name: Package content
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          stage = Path(".content-build/release")
+          files = {}
+
+          for collection in ("gigs", "testimonials"):
+              manifest = f"{collection}/{collection}.json"
+              files[manifest] = (stage / manifest).read_text(
+                  encoding="utf-8"
+              )
+
+              for filename in json.loads(files[manifest]):
+                  relative = f"{collection}/{filename}"
+                  files[relative] = (stage / relative).read_text(
+                      encoding="utf-8"
+                  )
+
+          bundle = {
+              "version": 1,
+              "commit": os.environ["GITHUB_SHA"],
+              # Sequence 1 was used for the initial manual upload.
+              "sequence": int(os.environ["GITHUB_RUN_NUMBER"]) + 1,
+              "files": files,
+          }
+
+          Path(".content-build/bundle.json").write_text(
+              json.dumps(bundle, ensure_ascii=False),
+              encoding="utf-8",
+          )
+
+          print(f"Prepared {len(files)} files")
+          PY
+
+      - name: Check this is still the latest commit
+        id: latest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          latest_sha=$(gh api \
+            "repos/$GITHUB_REPOSITORY/git/ref/heads/main" \
+            --jq '.object.sha')
+
+          if [[ "$latest_sha" == "$GITHUB_SHA" ]]; then
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "A newer commit exists. Skipping this publication."
+          fi
+
+      - name: Publish through restricted SSH receiver
+        if: steps.latest.outputs.publish == 'true'
+        env:
+          MBBB_SSH_HOST: ${{ secrets.MBBB_SSH_HOST }}
+          MBBB_SSH_PORT: ${{ secrets.MBBB_SSH_PORT }}
+          MBBB_SSH_USER: ${{ secrets.MBBB_SSH_USER }}
+          MBBB_SSH_PRIVATE_KEY: ${{ secrets.MBBB_SSH_PRIVATE_KEY }}
+          MBBB_SSH_KNOWN_HOSTS: ${{ secrets.MBBB_SSH_KNOWN_HOSTS }}
+        run: |
+          : "${MBBB_SSH_HOST:?Missing MBBB_SSH_HOST}"
+          : "${MBBB_SSH_PORT:?Missing MBBB_SSH_PORT}"
+          : "${MBBB_SSH_USER:?Missing MBBB_SSH_USER}"
+          : "${MBBB_SSH_PRIVATE_KEY:?Missing MBBB_SSH_PRIVATE_KEY}"
+          : "${MBBB_SSH_KNOWN_HOSTS:?Missing MBBB_SSH_KNOWN_HOSTS}"
+
+          ssh_dir=$(mktemp -d "$RUNNER_TEMP/mbbb-ssh.XXXXXX")
+          trap 'rm -rf -- "$ssh_dir"' EXIT
+
+          printf '%s\n' "$MBBB_SSH_PRIVATE_KEY" \
+            > "$ssh_dir/key"
+          printf '%s\n' "$MBBB_SSH_KNOWN_HOSTS" \
+            > "$ssh_dir/known_hosts"
+          chmod 600 "$ssh_dir/key" "$ssh_dir/known_hosts"
+
+          ssh -F /dev/null -T \
+            -i "$ssh_dir/key" \
+            -o IdentitiesOnly=yes \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$ssh_dir/known_hosts" \
+            -o ConnectTimeout=20 \
+            -o ServerAliveInterval=15 \
+            -o ServerAliveCountMax=3 \
+            -p "$MBBB_SSH_PORT" \
+            "$MBBB_SSH_USER@$MBBB_SSH_HOST" publish \
+            < .content-build/bundle.json
+
+      - name: Verify published content over HTTPS
+        if: steps.latest.outputs.publish == 'true'
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          from urllib.parse import quote
+          from urllib.request import Request, urlopen
+
+          bundle = json.loads(
+              Path(".content-build/bundle.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+
+          base = "https://mbbb.dcsmail.uk/content"
+          expected = f"{bundle['sequence']}-{bundle['commit']}"
+
+          request = Request(
+              f"{base}/current.json",
+              headers={"Cache-Control": "no-cache"},
+          )
+          with urlopen(request, timeout=30) as response:
+              current = json.load(response)
+
+          if current["release"] != expected:
+              raise SystemExit("Unexpected active release")
+
+          for path, expected_text in bundle["files"].items():
+              url = f"{base}/releases/{expected}/{quote(path, safe='/')}"
+              with urlopen(url, timeout=30) as response:
+                  actual = response.read()
+
+              if actual != expected_text.encode("utf-8"):
+                  raise SystemExit(f"Content mismatch: {path}")
+
+          print(f"Verified release: {expected}")
+          print(f"All {len(bundle['files'])} published files match.")
+          PY
