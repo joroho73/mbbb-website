@@ -1,0 +1,12 @@
+{
+  "name": "mbbb-website",
+  "private": true,
+  "scripts": {
+    "content:build": "node scripts/build-content.mjs",
+    "content:check": "node scripts/build-content.mjs --check",
+    "content:test": "node --test scripts/build-content.test.mjs"
+  },
+  "dependencies": {
+    "js-yaml": "^4.3.2"
+  }
+}
