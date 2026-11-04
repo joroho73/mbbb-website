@@ -1,17 +1,26 @@
-title: "Annie's Jazz Cafe"
-date: "2026-12-15"
-start_time: "Doors: 6:00PM | Music: 8:00PM | Last Food Orders: 7:30P"
-venue: "Brentwood Theatre"
-location: "Chalkwell Park Rooms, Chalkwell Park London Road, A13, Southend-on-Sea, Westcliff-on-Sea SS0 8NB"
-running_time: "2 hours, including 20 min interval"
-description: |- 
-  We wrap up 2026 at Annie’s Jazz by welcoming back the hugely popular Melvin Beddow Big Band for a special Christmas show. From the irresistible rhythms of swing and jive, to the timeless energy of rock & roll, pop and jazz.
+title: Annie's Jazz Cafe
+date: 2026-12-15
+start_time: "Doors: 6:00PM | Music: 8:00PM | Last Food Orders: 7:30PM"
+venue: Brentwood Theatre
+location: Chalkwell Park Rooms, Chalkwell Park London Road, A13,
+  Southend-on-Sea, Westcliff-on-Sea SS0 8NB
+running_time: 2 hours, including 20 min interval
+description: >-
+  We wrap up 2026 at Annie’s Jazz by welcoming back the hugely popular Melvin
+  Beddow Big Band for a special Christmas show. From the irresistible rhythms of
+  swing and jive, to the timeless energy of rock & roll, pop and jazz.
 
-  With over 25 years of experience performing across Essex, they know how to put on a great show and were hugely popular on their first visit last year. Due to the size of the band, audience numbers will need to be restricted, so book in early and celebrate the Christmas season with us in style.
+
+  With over 25 years of experience performing across Essex, they know how to put
+  on a great show and were hugely popular on their first visit last year. Due to
+  the size of the band, audience numbers will need to be restricted, so book in
+  early and celebrate the Christmas season with us in style.
+
 
   A delicious menu is available before the show, with 2 courses for just £12!
 
+
   Tables seat up to 6 people. Smaller parties should expect to share a table.
-ticket_url: "https://www.anniesjazz.co.uk/events/melvin-beddow-big-band-christmas-special"
+ticket_url: https://www.anniesjazz.co.uk/events/melvin-beddow-big-band-christmas-special
 ticket_price: "Member: £16 | Non-Member: £18"
 published: true
