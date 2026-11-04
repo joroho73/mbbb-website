@@ -1,15 +1,19 @@
-title: "End of Year Concert"
-date: "2026-11-22"
-start_time: "3pm"
-venue: "Brentwood Theatre"
-location: "Brentwood Theatre, Brentwood, CM15 8AG"
-running_time: "2 hours, including 20 min interval"
-description: |- 
-  Join us for a festive evening of music and celebration as we wrap up the year with our End of Year Concert. 
-  
-  Enjoy a diverse repertoire of jazz, swing, and big-band classics performed by our talented musicians. 
-  
+title: End of Year Concert
+date: 2026-11-22
+start_time: 3 pm
+venue: Brentwood Theatre
+location: Brentwood Theatre, Brentwood, CM15 8AG
+running_time: 2 hours, including 20 min interval
+description: >-
+  Join us for a festive evening of music and celebration as we wrap up the year
+  with our End of Year Concert. 
+
+
+  Enjoy a diverse repertoire of jazz, swing, and big-band classics performed by
+  our talented musicians. 
+
+
   This special event promises to be a memorable experience for all music lovers.
-ticket_url: "https://www.ticketsource.com/brentwoodtheatre/t-vxzxpzo"
-ticket_price: "£16.04 - £19.24 including booking fee"
+ticket_url: https://www.ticketsource.com/brentwoodtheatre/t-vxzxpzo
+ticket_price: £16.04 - £19.24 including booking fee
 published: true
