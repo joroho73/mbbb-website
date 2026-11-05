@@ -7,7 +7,6 @@ async function loadFeaturedTestimonials() {
   const quote = document.querySelector("#featured-testimonial-text");
   const reviewer = document.querySelector("#featured-testimonial-reviewer");
   const fullLink = document.querySelector("#featured-testimonial-link");
-  const pauseButton = document.querySelector("#testimonial-pause");
 
   try {
     const contentBase = await window.getContentBase();
@@ -59,9 +58,9 @@ async function loadFeaturedTestimonials() {
     // The "View all testimonials" link remains if there are no featured reviews.
     if (!featured.length) return;
 
-    let currentIndex = 0;
+    const currentIndex = Math.floor(Math.random() * featured.length);
 
-    function showTestimonial(index) {
+       function showTestimonial(index) {
       const { filename, review } = featured[index];
 
       const firstParagraph = review.review_text
@@ -70,7 +69,6 @@ async function loadFeaturedTestimonials() {
         .replace(/\s+/g, " ")
         .trim();
 
-      // Avoid adding a second ellipsis if the paragraph already ends with one.
       quote.textContent = firstParagraph;
       reviewer.textContent = review.reviewer;
 
@@ -83,63 +81,9 @@ async function loadFeaturedTestimonials() {
       );
     }
 
-    showTestimonial(currentIndex);
+    showTestimonial(Math.floor(Math.random() * featured.length));
     container.hidden = false;
 
-    if (featured.length < 2) return;
-
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    );
-
-    let paused = reducedMotion.matches;
-    let timer;
-
-    pauseButton.hidden = false;
-
-    function updateRotation() {
-      window.clearInterval(timer);
-
-      pauseButton.textContent = paused
-        ? "Play testimonials"
-        : "Pause testimonials";
-
-      // Pause while someone is interacting with the section or away from the tab.
-      if (
-        paused ||
-        document.hidden ||
-        section.matches(":hover") ||
-        section.contains(document.activeElement)
-      ) {
-        return;
-      }
-
-      timer = window.setInterval(() => {
-        currentIndex = (currentIndex + 1) % featured.length;
-        showTestimonial(currentIndex);
-      }, 5000);
-    }
-
-    pauseButton.addEventListener("click", () => {
-      paused = !paused;
-      updateRotation();
-    });
-
-    section.addEventListener("mouseenter", updateRotation);
-    section.addEventListener("mouseleave", updateRotation);
-    section.addEventListener("focusin", updateRotation);
-    section.addEventListener("focusout", () => {
-      window.setTimeout(updateRotation, 0);
-    });
-
-    document.addEventListener("visibilitychange", updateRotation);
-
-    reducedMotion.addEventListener("change", (event) => {
-      paused = event.matches;
-      updateRotation();
-    });
-
-    updateRotation();
   } catch (error) {
     console.error("Could not load featured testimonials:", error);
   }
