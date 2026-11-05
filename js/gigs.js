@@ -16,6 +16,26 @@
     "ticket_price"
   ];
 
+  const mapPinIcon = `
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    class="gig-map-pin"
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/>
+    <circle cx="12" cy="10" r="3"/>
+  </svg>
+`;
+
   function createElement(tag, className, text) {
     const element = document.createElement(tag);
 
@@ -210,6 +230,7 @@
         `${gig.location} — view on Google Maps (opens in a new tab)`
       );
 
+      mapLink.innerHTML = mapPinIcon;
       const text = createElement("span", "", gig.location);
       const icon = createElement("span", "gig-map-icon", " ↗");
       icon.setAttribute("aria-hidden", "true");

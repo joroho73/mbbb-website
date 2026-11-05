@@ -1,7 +1,7 @@
 /* Gigs */
 .gigs {
   display: grid;
-  grid-template-columns: .78fr 1.22fr;
+  grid-template-columns: 0.78fr 1.22fr;
   gap: 9vw;
   padding: clamp(80px, 11vw, 150px) clamp(25px, 8vw, 120px);
 }
@@ -30,7 +30,7 @@
   font-family: var(--serif);
   font-size: 58px;
   font-weight: 500;
-  line-height: .8;
+  line-height: 0.8;
 }
 
 .gig-card time span {
@@ -69,7 +69,7 @@
   padding: 32px 24px 40px;
 }
 
- .gig-card {
+.gig-card {
   grid-template-columns: 67px 1fr;
   gap: 17px;
 }
@@ -119,7 +119,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 48px 32px;
-  grid-template-columns: minmax(0, .7fr) minmax(0, 1.3fr);
+  grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
   align-items: start;
   gap: 48px;
 }
@@ -154,7 +154,7 @@
   margin-top: 16px;
   padding: 10px 14px;
   border-radius: 4px;
-  background: rgba(255, 255, 255, .05);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .gig-map-link {
@@ -259,4 +259,16 @@
 .gigs-listing-page .gig-card--full a.gig-ticket-button {
   display: inline-flex;
   margin-top: 24px;
+}
+
+.gig-map-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.45rem;
+}
+
+.gig-map-pin {
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-top: 0.2em;
 }
