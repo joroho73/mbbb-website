@@ -1,4 +1,6 @@
-# Manage Content and Source Control
+# How to Manage Code Changes with GitHub Source Control
+
+This document details how to manage changes to the code now that *Gigs* and *Testimonials* are Content Managed.
 
 Treat GitHub as the shared source of truth: Pages CMS saves changes there, and your local folder needs to pull them down.
 
