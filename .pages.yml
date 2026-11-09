@@ -178,7 +178,7 @@ content:
         default: false
         description: "Include this photograph in the random homepage selection. Choose a landscape image that suits a wide crop."
 
-  - name: published
+      - name: published
         label: Published
         type: boolean
         default: false
