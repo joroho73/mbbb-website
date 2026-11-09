@@ -156,16 +156,11 @@ content:
         required: true
         description: "Upload a photograph or select an existing image."
 
-      - name: alt
-        label: Alternative text
-        type: string
-        required: true
-        description: "Briefly describe what is visible for someone who cannot see the photograph."
-
       - name: caption
-        label: Caption
+        label: Description
         type: text
-        description: "Optional text displayed with the enlarged photograph."
+        required: true
+        description: "Briefly describe what the photograph shows. Used as the gallery caption and alternative text."
 
       - name: photographer
         label: Photographer credit

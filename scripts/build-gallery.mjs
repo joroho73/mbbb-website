@@ -9,7 +9,7 @@ const root = path.resolve(
 );
 
 const sourceDirectory = path.join(root, "gallery/photos");
-const destination = path.join(root, "gallery/photos.generated.json");
+const destination = path.join(root, "gallery/photos.json");
 
 async function buildGallery() {
   const entries = await fs.readdir(sourceDirectory, {
@@ -50,7 +50,7 @@ async function buildGallery() {
       // Unpublished records do not appear in the generated manifest.
       if (!record.published) continue;
 
-      for (const field of ["title", "image", "alt"]) {
+      for (const field of ["title", "image"]) {
         if (typeof record[field] !== "string" ||
             !record[field].trim()) {
           throw new Error(`${field} is required.`);
@@ -61,7 +61,7 @@ async function buildGallery() {
         throw new Error("use_on_homepage must be true or false.");
       }
 
-      for (const field of ["caption", "photographer"]) {
+      for (const field of ["caption", "photographer", "alt"]) {
         if (record[field] != null &&
             typeof record[field] !== "string") {
           throw new Error(`${field} must be text.`);
@@ -88,11 +88,17 @@ async function buildGallery() {
         throw new Error("The selected image must be a regular file.");
       }
 
+      // Prefer Description; preserve older records until they are updated.
+      const description =
+        record.caption?.trim() ||
+        record.alt?.trim() ||
+        record.title.trim();
+
       photos.push({
         title: record.title.trim(),
         file: match[1],
-        alt: record.alt.trim(),
-        caption: (record.caption ?? "").trim(),
+        alt: description,
+        caption: description,
         photographer: (record.photographer ?? "").trim(),
         use_on_homepage: record.use_on_homepage,
         published: true
@@ -123,7 +129,7 @@ async function buildGallery() {
   }
 
   console.log(
-    `Generated gallery/photos.generated.json: ` +
+    `Generated gallery/photos.json: ` +
     `${photos.length} published photographs.`
   );
 }
