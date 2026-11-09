@@ -19,12 +19,12 @@
   let current = 0;
   let opener = null;
 
-  function imagePath(filename) {
+  function imagePath(filename, contentBase) {
     if (typeof filename !== "string" || !filename.trim() ||
         /[\\/]/.test(filename) || !/\.(jpe?g|png|webp|avif|gif)$/i.test(filename)) {
       throw new Error("Each image must have a filename, such as band.jpg, without a folder path.");
     }
-    return `/assets/gallery/${encodeURIComponent(filename)}`;
+    return `${contentBase}/assets/gallery/${encodeURIComponent(filename)}`;
   }
 
   function showPhoto(index) {
@@ -64,7 +64,8 @@
 
   async function loadGallery() {
     try {
-      const response = await fetch("/gallery/photos.json");
+      const contentBase = await window.getContentBase();
+      const response = await fetch(`${contentBase}/gallery/photos.json`);
       if (!response.ok) throw new Error(`Manifest request failed: ${response.status}`);
       const records = await response.json();
       if (!Array.isArray(records)) throw new Error("photos.json must contain an array.");
@@ -76,8 +77,8 @@
           throw new Error(`Photo ${index + 1} needs an alt description.`);
         }
         return {
-          src: imagePath(record.file),
-          thumbnail: imagePath(record.thumbnail || record.file),
+          src: imagePath(record.file, contentBase),
+          thumbnail: imagePath(record.thumbnail || record.file, contentBase),
           alt: record.alt.trim(),
           caption: [
             typeof record.caption === "string" ? record.caption.trim() : "",
@@ -95,7 +96,6 @@
       }
 
       const fragment = document.createDocumentFragment();
-
 
       photos.forEach((photo, index) => {
         const item = document.createElement("li");

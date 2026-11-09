@@ -6,7 +6,9 @@
 
   async function loadHomepageImage() {
     try {
-      const response = await fetch("/gallery/photos.json", {
+      const contentBase = await window.getContentBase();
+
+      const response = await fetch(`${contentBase}/gallery/photos.json`, {
         cache: "no-cache"
       });
 
@@ -36,8 +38,7 @@
         Math.floor(Math.random() * candidates.length)
       ];
 
-      const source =
-        `/assets/gallery/${encodeURIComponent(selected.file)}`;
+      const source = `${contentBase}/assets/gallery/${encodeURIComponent(selected.file)}`;
 
       // Download and decode before replacing the fallback photograph.
       const preload = new Image();

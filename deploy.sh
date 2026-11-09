@@ -32,6 +32,10 @@ rsync -avz \
     --exclude '.gitignore' \
     --exclude '.pages.yml' \
     --exclude '.vscode/' \
+    --exclude '/assets/gallery/' \
+    --exclude '/gallery/photos/' \
+    --exclude '/gallery/photos.json' \
+    --exclude '/gallery/photos.generated.json' \
     --exclude '/gigs/*.yaml' \
     --exclude '/gigs/*.yml' \
     --exclude '/gigs/gigs.json' \

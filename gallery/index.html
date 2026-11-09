@@ -1,64 +1,105 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="See the Melvin Beddow Big Band in action. Browse photographs of the band and its live performances.">
-  
-  <title>Photo gallery | Melvin Beddow Big Band</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
- 
-  <link rel="icon" type="image/png" href="/assets/favicon/favicon-96x96.png" sizes="96x96" />
-  <link rel="icon" type="image/svg+xml" href="/assets/favicon/favicon.svg" />
-  <link rel="shortcut icon" href="/assets/favicon/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png" />
-  <link rel="manifest" href="/assets/favicon/site.webmanifest" />
- 
-  <link rel="stylesheet" href="/css/styles.css">
-  <link rel="stylesheet" href="/css/menu-styles.css">
-  <link rel="stylesheet" href="/css/gallery.css">
-  
-  <script defer src="/js/gallery.js"></script>
-</head>
-<body id="top">
-  <div id="site-header"></div>
-  <main id="main-content">
-    <section class="page-header" aria-labelledby="page-title">
-      <p class="eyebrow">The band in pictures</p>
-      <h1 id="page-title">Photo gallery</h1>
-      <p class="page-intro">A few moments from the stage, capturing the music, the musicians and the atmosphere.</p>
-    </section>
-    <hr class="page-divider">
-    <section class="photo-gallery" aria-label="Band photographs">
-      <p id="gallery-status" role="status">Loading photographs…</p>
-      <ul id="gallery-grid" class="gallery-grid"></ul>
-      <noscript>Please enable JavaScript to view the photo gallery.</noscript>
-      <p class="gallery-copyright">
-        Photographs remain the copyright of their respective owners.
-        For permission to reuse an image, please
-        <a href="/#enquiries">contact us</a>.
-      </p>
-    </section>
-  </main>
-  <div id="site-footer"></div>
-  <dialog id="gallery-lightbox" class="gallery-lightbox" aria-labelledby="gallery-dialog-title">
-    <div class="gallery-viewer">
-      <h2 id="gallery-dialog-title" class="gallery-sr-only">Photograph viewer</h2>
-      <button type="button" class="gallery-close" aria-label="Close photograph viewer" autofocus>×</button>
-      <figure class="gallery-full-photo">
-        <img id="gallery-full-image" alt="">
-        <figcaption id="gallery-caption"></figcaption>
-      </figure>
-      <div class="gallery-controls">
-        <button type="button" id="gallery-previous" aria-label="Previous photograph">← Previous</button>
-        <span id="gallery-counter" role="status" aria-live="polite"></span>
-        <button type="button" id="gallery-next" aria-label="Next photograph">Next →</button>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="See the Melvin Beddow Big Band in action. Browse photographs of the band and its live performances."
+    />
+
+    <title>Photo gallery | Melvin Beddow Big Band</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="icon"
+      type="image/png"
+      href="/assets/favicon/favicon-96x96.png"
+      sizes="96x96"
+    />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon/favicon.svg" />
+    <link rel="shortcut icon" href="/assets/favicon/favicon.ico" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/assets/favicon/apple-touch-icon.png"
+    />
+    <link rel="manifest" href="/assets/favicon/site.webmanifest" />
+
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/menu-styles.css" />
+    <link rel="stylesheet" href="/css/gallery.css" />
+
+    <script defer src="/js/content-source.js"></script>
+    <script defer src="/js/gallery.js"></script>
+  </head>
+  <body id="top">
+    <div id="site-header"></div>
+    <main id="main-content">
+      <section class="page-header" aria-labelledby="page-title">
+        <p class="eyebrow">The band in pictures</p>
+        <h1 id="page-title">Photo gallery</h1>
+        <p class="page-intro">
+          A few moments from the stage, capturing the music, the musicians and
+          the atmosphere.
+        </p>
+      </section>
+      <hr class="page-divider" />
+      <section class="photo-gallery" aria-label="Band photographs">
+        <p id="gallery-status" role="status">Loading photographs…</p>
+        <ul id="gallery-grid" class="gallery-grid"></ul>
+        <noscript>Please enable JavaScript to view the photo gallery.</noscript>
+        <p class="gallery-copyright">
+          Photographs remain the copyright of their respective owners. For
+          permission to reuse an image, please
+          <a href="/#enquiries">contact us</a>
+          .
+        </p>
+      </section>
+    </main>
+    <div id="site-footer"></div>
+    <dialog
+      id="gallery-lightbox"
+      class="gallery-lightbox"
+      aria-labelledby="gallery-dialog-title"
+    >
+      <div class="gallery-viewer">
+        <h2 id="gallery-dialog-title" class="gallery-sr-only">
+          Photograph viewer
+        </h2>
+        <button
+          type="button"
+          class="gallery-close"
+          aria-label="Close photograph viewer"
+          autofocus
+        >
+          ×
+        </button>
+        <figure class="gallery-full-photo">
+          <img id="gallery-full-image" alt="" />
+          <figcaption id="gallery-caption"></figcaption>
+        </figure>
+        <div class="gallery-controls">
+          <button
+            type="button"
+            id="gallery-previous"
+            aria-label="Previous photograph"
+          >
+            ← Previous
+          </button>
+          <span id="gallery-counter" role="status" aria-live="polite"></span>
+          <button type="button" id="gallery-next" aria-label="Next photograph">
+            Next →
+          </button>
+        </div>
       </div>
-    </div>
-  </dialog> 
-  <script src="/js/includes.js"></script>
-</body>
+    </dialog>
+    <script src="/js/includes.js"></script>
+  </body>
 </html>
