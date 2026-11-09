@@ -48,8 +48,9 @@
       hero.alt = selected.alt.trim();
       hero.src = source;
     } catch (error) {
-      // Leave the original hero photograph in place.
       console.warn("Could not load a homepage photograph:", error);
+    } finally {
+      document.documentElement.classList.remove("homepage-image-pending");
     }
   }
 

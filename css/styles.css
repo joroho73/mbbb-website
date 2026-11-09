@@ -5,16 +5,16 @@
   --paper: #eee8dc;
   --highlight: #b02d7e;
   --highlight-soft: #e6b8d4;
-  --line: rgba(176, 45, 126, .34);
+  --line: rgba(176, 45, 126, 0.34);
   --muted: #a9b2ae;
 
   --serif: "Playfair Display", Georgia, serif;
   --sans: "DM Sans", Arial, sans-serif;
 
-  --text-small: .875rem;
-  --text-meta: .95rem;
-  --text-label: .6875rem;
-  --label-spacing: .2em;
+  --text-small: 0.875rem;
+  --text-meta: 0.95rem;
+  --text-label: 0.6875rem;
+  --label-spacing: 0.2em;
 
   --link-color: var(--highlight-soft);
   --link-hover: var(--paper);
@@ -22,6 +22,10 @@
   --meta-color: var(--muted);
   --emphasis-color: var(--highlight);
   --focus-color: var(--highlight-soft);
+}
+
+.homepage-image-pending #homepage-hero-image {
+  visibility: hidden;
 }
 
 /* Base */
@@ -77,8 +81,8 @@ h2,
 .section-title {
   font-family: var(--serif);
   font-weight: 500;
-  line-height: .97;
-  letter-spacing: -.035em;
+  line-height: 0.97;
+  letter-spacing: -0.035em;
   text-transform: none;
 }
 
@@ -184,7 +188,7 @@ h2 em,
   letter-spacing: normal;
   text-transform: none;
   text-decoration: none;
-  transition: color .2s;
+  transition: color 0.2s;
 }
 
 .text-link {
@@ -193,7 +197,7 @@ h2 em,
 }
 
 .text-link span {
-  margin-left: .4em;
+  margin-left: 0.4em;
   color: currentColor;
 }
 
@@ -247,7 +251,7 @@ h2 em,
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  gap: .6em;
+  gap: 0.6em;
   min-height: 52px;
   padding: 14px 23px;
   border: 1px solid transparent;
@@ -259,7 +263,10 @@ h2 em,
   letter-spacing: normal;
   text-transform: none;
   text-decoration: none;
-  transition: transform .2s, background .2s, color .2s;
+  transition:
+    transform 0.2s,
+    background 0.2s,
+    color 0.2s;
 }
 
 .button:hover,
@@ -307,7 +314,7 @@ h2 em,
 .hero {
   min-height: calc(100svh - 92px);
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(420px, .85fr);
+  grid-template-columns: minmax(0, 1.15fr) minmax(420px, 0.85fr);
   position: relative;
   overflow: hidden;
 }
@@ -321,7 +328,7 @@ h2 em,
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: saturate(.68) contrast(1.08) brightness(.82);
+  filter: saturate(0.68) contrast(1.08) brightness(0.82);
 }
 
 .hero-image::after {
@@ -329,8 +336,8 @@ h2 em,
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(7, 20, 22, .15) 45%, var(--ink) 100%),
-    linear-gradient(0deg, rgba(7, 20, 22, .55), transparent 52%);
+    linear-gradient(90deg, rgba(7, 20, 22, 0.15) 45%, var(--ink) 100%),
+    linear-gradient(0deg, rgba(7, 20, 22, 0.55), transparent 52%);
 }
 
 .image-label {
@@ -339,7 +346,7 @@ h2 em,
   left: 34px;
   bottom: 31px;
   padding: 8px 13px;
-  border: 1px solid rgba(255, 255, 255, .55);
+  border: 1px solid rgba(255, 255, 255, 0.55);
 }
 
 .hero-copy {
@@ -362,7 +369,7 @@ h2 em,
   bottom: 18px;
   font-family: var(--serif);
   font-size: 72px;
-  color: rgba(176, 45, 126, .13);
+  color: rgba(176, 45, 126, 0.13);
 }
 
 /* Pull quote */
@@ -390,7 +397,7 @@ h2 em,
   top: 20px;
   font-family: var(--serif);
   font-size: 150px;
-  color: rgba(255, 255, 255, .25);
+  color: rgba(255, 255, 255, 0.25);
   line-height: 1;
 }
 
@@ -405,7 +412,7 @@ h2 em,
 /* About and shared section layout */
 .section-grid {
   display: grid;
-  grid-template-columns: .8fr 1.2fr;
+  grid-template-columns: 0.8fr 1.2fr;
   gap: 10vw;
   padding: clamp(80px, 11vw, 160px) clamp(25px, 8vw, 120px);
 }
@@ -500,7 +507,7 @@ h2 em,
 /* Music */
 .sound {
   display: grid;
-  grid-template-columns: 1.1fr .9fr;
+  grid-template-columns: 1.1fr 0.9fr;
   min-height: 690px;
   background: var(--ink-2);
 }
@@ -514,7 +521,7 @@ h2 em,
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: saturate(.55) contrast(1.08);
+  filter: saturate(0.55) contrast(1.08);
 }
 
 .sound-copy {
@@ -551,7 +558,6 @@ h2 em,
   color: var(--highlight-soft);
 }
 
-
 .page-intro {
   max-width: 700px;
   margin: 0;
@@ -566,7 +572,9 @@ h2 em,
   display: grid;
   place-items: center;
   color: var(--highlight-soft);
-  transition: background .2s, color .2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 
 a.circle-arrow:hover,
@@ -590,7 +598,7 @@ a.circle-arrow:focus-visible {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: saturate(.7) contrast(1.08);
+  filter: saturate(0.7) contrast(1.08);
 }
 
 .testimonial-copy {
@@ -609,7 +617,7 @@ a.circle-arrow:focus-visible {
 }
 
 #testimonial-pause {
-  margin-top: .75rem;
+  margin-top: 0.75rem;
 }
 
 /* Dedicated testimonials page */
@@ -645,7 +653,7 @@ a.circle-arrow:focus-visible {
 }
 
 .testimonial + .testimonial {
-  border-top: 1px solid rgba(255, 255, 255, .2);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .testimonial blockquote {
@@ -668,7 +676,7 @@ a.circle-arrow:focus-visible {
 /* Enquiries */
 .enquiries {
   display: grid;
-  grid-template-columns: .85fr 1.15fr;
+  grid-template-columns: 0.85fr 1.15fr;
   gap: 10vw;
   padding: clamp(85px, 11vw, 155px) clamp(25px, 8vw, 120px);
   background: #081719;
@@ -729,7 +737,7 @@ a.circle-arrow:focus-visible {
   width: 100%;
   min-width: 0;
   border: 0;
-  border-bottom: 1px solid rgba(238, 232, 220, .28);
+  border-bottom: 1px solid rgba(238, 232, 220, 0.28);
   border-radius: 0;
   background: transparent;
   color: var(--paper);
@@ -786,7 +794,7 @@ a.circle-arrow:focus-visible {
 /* Footer — navigation header remains in menu-styles.css */
 footer {
   display: grid;
-  grid-template-columns: 1.5fr .65fr .85fr;
+  grid-template-columns: 1.5fr 0.65fr 0.85fr;
   gap: 6vw;
   padding: 65px clamp(25px, 6vw, 95px) 28px;
   background: #030d0f;
@@ -835,7 +843,7 @@ footer {
 
 .footer-bottom {
   grid-column: 1 / -1;
-  border-top: 1px solid rgba(238, 232, 220, .1);
+  border-top: 1px solid rgba(238, 232, 220, 0.1);
   padding-top: 22px;
   margin-top: 22px;
   display: flex;
@@ -935,7 +943,6 @@ footer {
     padding: 68px 24px;
   }
 
-
   .field-row {
     grid-template-columns: 1fr;
     gap: 0;
@@ -981,7 +988,6 @@ footer {
     transform: none;
   }
 }
-
 
 /* Give the hero heading more room at intermediate desktop widths. */
 @media (min-width: 951px) and (max-width: 1400px) {
