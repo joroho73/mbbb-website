@@ -170,3 +170,41 @@ jobs:
               f"{len(bundle['images'])} images match."
           )
           PY
+
+      - name: Clean up old releases after verification
+        if: steps.latest.outputs.publish == 'true'
+        env:
+          MBBB_SSH_HOST: ${{ secrets.MBBB_SSH_HOST }}
+          MBBB_SSH_PORT: ${{ secrets.MBBB_SSH_PORT }}
+          MBBB_SSH_USER: ${{ secrets.MBBB_SSH_USER }}
+          MBBB_SSH_PRIVATE_KEY: ${{ secrets.MBBB_SSH_PRIVATE_KEY }}
+          MBBB_SSH_KNOWN_HOSTS: ${{ secrets.MBBB_SSH_KNOWN_HOSTS }}
+        run: |
+          : "${MBBB_SSH_HOST:?Missing MBBB_SSH_HOST}"
+          : "${MBBB_SSH_PORT:?Missing MBBB_SSH_PORT}"
+          : "${MBBB_SSH_USER:?Missing MBBB_SSH_USER}"
+          : "${MBBB_SSH_PRIVATE_KEY:?Missing MBBB_SSH_PRIVATE_KEY}"
+          : "${MBBB_SSH_KNOWN_HOSTS:?Missing MBBB_SSH_KNOWN_HOSTS}"
+
+          ssh_dir=$(mktemp -d "$RUNNER_TEMP/mbbb-ssh.XXXXXX")
+          trap 'rm -rf -- "$ssh_dir"' EXIT
+
+          printf '%s\n' "$MBBB_SSH_PRIVATE_KEY" \
+            > "$ssh_dir/key"
+          printf '%s\n' "$MBBB_SSH_KNOWN_HOSTS" \
+            > "$ssh_dir/known_hosts"
+          chmod 600 "$ssh_dir/key" "$ssh_dir/known_hosts"
+
+          ssh -F /dev/null -T \
+            -i "$ssh_dir/key" \
+            -o IdentitiesOnly=yes \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$ssh_dir/known_hosts" \
+            -o ConnectTimeout=20 \
+            -o ServerAliveInterval=15 \
+            -o ServerAliveCountMax=3 \
+            -p "$MBBB_SSH_PORT" \
+            "$MBBB_SSH_USER@$MBBB_SSH_HOST" \
+            "cleanup $((GITHUB_RUN_NUMBER + 1))-$GITHUB_SHA"
+

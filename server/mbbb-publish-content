@@ -17,6 +17,7 @@ import shutil
 import signal
 import sys
 import tempfile
+import time
 
 ROOT = Path('/srv/mbbb-content')
 MAX_UPLOAD = 32 * 1024 * 1024
@@ -176,6 +177,44 @@ def publish(raw, root=ROOT):
         return 'Published: ' + release
 
 
+def cleanup(expected=None, dry_run=False, root=ROOT, now=None):
+    """Keep active, five newest, and all releases younger than seven days."""
+    require(root.is_dir(), 'Content directory does not exist')
+    pattern = re.compile(r'[1-9]\d*-[a-f0-9]{40}')
+    with (root / '.publish.lock').open('a') as lock:
+        # Share the publication lock so activation cannot race deletion.
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        releases = root / 'releases'
+        require(releases.is_dir() and not releases.is_symlink(), 'Invalid releases directory')
+        current = root / 'current'
+        require(current.is_symlink(), 'Current path must be a symlink')
+        active = current.resolve(strict=True)
+        require(active.parent == releases.resolve() and pattern.fullmatch(active.name),
+                'Current release is outside the releases directory')
+        metadata = parse_json((active / 'release.json').read_text(encoding='utf-8'))
+        require(metadata.get('release') == active.name, 'Current release metadata mismatch')
+        if expected is not None:
+            require(expected == active.name, 'Active release changed; cleanup skipped')
+        candidates = [entry for entry in releases.iterdir()
+                      if pattern.fullmatch(entry.name)
+                      and not entry.is_symlink() and entry.is_dir()]
+        candidates.sort(key=lambda entry: int(entry.name.split('-', 1)[0]), reverse=True)
+        protected = {entry.name for entry in candidates[:5]} | {active.name}
+        cutoff = (time.time() if now is None else now) - 7 * 24 * 60 * 60
+        removed = 0
+        for entry in candidates:
+            # Directory mtime records when the release was assembled on this server.
+            if entry.name in protected or entry.stat().st_mtime >= cutoff:
+                continue
+            if dry_run:
+                print('Would remove: ' + entry.name)
+            else:
+                shutil.rmtree(entry)
+                print('Removed: ' + entry.name)
+            removed += 1
+        return f"Cleanup {'preview' if dry_run else 'complete'}: {removed} releases {'eligible' if dry_run else 'removed'}; active release protected: {active.name}"
+
+
 def main():
     os.umask(0o022)
     signal.alarm(120)
@@ -185,8 +224,14 @@ def main():
         print('MBBB content receiver ready (protocols 1 and 2). No content changed.')
     elif command == 'publish':
         print(publish(sys.stdin.buffer.read(MAX_UPLOAD + 1)))
+    elif command == 'cleanup-preview':
+        print(cleanup(dry_run=True))
+    elif command.startswith('cleanup '):
+        expected = command.removeprefix('cleanup ')
+        require(re.fullmatch(r'[1-9]\d*-[a-f0-9]{40}', expected), 'Invalid cleanup release')
+        print(cleanup(expected=expected))
     else:
-        raise ValueError('Only check and publish commands are allowed')
+        raise ValueError('Only check, publish, cleanup-preview and cleanup RELEASE commands are allowed')
 
 
 if __name__ == '__main__':
@@ -195,3 +240,4 @@ if __name__ == '__main__':
     except (ValueError, OSError) as error:
         print('Publication rejected: ' + str(error), file=sys.stderr)
         sys.exit(1)
+
