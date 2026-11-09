@@ -140,7 +140,7 @@
     "alt": "alttext",
     "caption": "alttext",
     "photographer": "",
-    "use_on_homepage": false,
+    "use_on_homepage": true,
     "published": true
   },
   {
