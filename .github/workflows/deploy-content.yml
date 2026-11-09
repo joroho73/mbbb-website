@@ -45,43 +45,19 @@ jobs:
           mkdir -p .content-build
           npm run content:build -- --stage .content-build/release
 
+      - name: Validate and stage gallery
+        run: |
+          node scripts/build-gallery.mjs \
+            --stage .content-build/gallery-release
+
       - name: Package content
         run: |
-          python3 - <<'PY'
-          import json
-          import os
-          from pathlib import Path
-
-          stage = Path(".content-build/release")
-          files = {}
-
-          for collection in ("gigs", "testimonials"):
-              manifest = f"{collection}/{collection}.json"
-              files[manifest] = (stage / manifest).read_text(
-                  encoding="utf-8"
-              )
-
-              for filename in json.loads(files[manifest]):
-                  relative = f"{collection}/{filename}"
-                  files[relative] = (stage / relative).read_text(
-                      encoding="utf-8"
-                  )
-
-          bundle = {
-              "version": 1,
-              "commit": os.environ["GITHUB_SHA"],
-              # Sequence 1 was used for the initial manual upload.
-              "sequence": int(os.environ["GITHUB_RUN_NUMBER"]) + 1,
-              "files": files,
-          }
-
-          Path(".content-build/bundle.json").write_text(
-              json.dumps(bundle, ensure_ascii=False),
-              encoding="utf-8",
-          )
-
-          print(f"Prepared {len(files)} files")
-          PY
+          python3 scripts/package-content.py \
+            --content .content-build/release \
+            --gallery .content-build/gallery-release \
+            --commit "$GITHUB_SHA" \
+            --sequence "$((GITHUB_RUN_NUMBER + 1))" \
+            --output .content-build/bundle.json
 
       - name: Check this is still the latest commit
         id: latest
@@ -140,6 +116,7 @@ jobs:
         if: steps.latest.outputs.publish == 'true'
         run: |
           python3 - <<'PY'
+          import base64
           import json
           from pathlib import Path
           from urllib.parse import quote
@@ -158,20 +135,38 @@ jobs:
               f"{base}/current.json",
               headers={"Cache-Control": "no-cache"},
           )
+
           with urlopen(request, timeout=30) as response:
               current = json.load(response)
 
           if current["release"] != expected:
               raise SystemExit("Unexpected active release")
 
-          for path, expected_text in bundle["files"].items():
-              url = f"{base}/releases/{expected}/{quote(path, safe='/')}"
+          expected_files = {
+              path: text.encode("utf-8")
+              for path, text in bundle["files"].items()
+          }
+
+          expected_files.update({
+              path: base64.b64decode(encoded, validate=True)
+              for path, encoded in bundle["images"].items()
+          })
+
+          for path, expected_bytes in expected_files.items():
+              url = (
+                  f"{base}/releases/{expected}/"
+                  f"{quote(path, safe='/')}"
+              )
+
               with urlopen(url, timeout=30) as response:
                   actual = response.read()
 
-              if actual != expected_text.encode("utf-8"):
+              if actual != expected_bytes:
                   raise SystemExit(f"Content mismatch: {path}")
 
           print(f"Verified release: {expected}")
-          print(f"All {len(bundle['files'])} published files match.")
+          print(
+              f"All {len(bundle['files'])} text files and "
+              f"{len(bundle['images'])} images match."
+          )
           PY

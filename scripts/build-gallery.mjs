@@ -9,7 +9,25 @@ const root = path.resolve(
 );
 
 const sourceDirectory = path.join(root, "gallery/photos");
-const destination = path.join(root, "gallery/photos.json");
+const args = process.argv.slice(2);
+
+if (
+  args.length !== 0 &&
+  !(args.length === 2 && args[0] === "--stage" && args[1])
+) {
+  throw new Error(
+    "Usage: node scripts/build-gallery.mjs [--stage NEW_DIRECTORY]"
+  );
+}
+
+const stageDirectory = args.length
+  ? path.resolve(root, args[1])
+  : null;
+
+const destination = path.join(
+  stageDirectory || root,
+  "gallery/photos.json"
+);
 
 async function buildGallery() {
   const entries = await fs.readdir(sourceDirectory, {
@@ -72,7 +90,7 @@ async function buildGallery() {
 
       // Accept an image directly inside our gallery image folder.
       const match = image.match(
-        /^\/assets\/gallery\/([^/\\?#%]+\.(?:jpe?g|png|webp))$/i
+        /^\/assets\/gallery\/([a-zA-Z0-9][a-zA-Z0-9_.-]*\.(?:jpe?g|png|webp))$/i
       );
 
       if (!match) {
@@ -115,6 +133,27 @@ async function buildGallery() {
     );
   }
 
+  if (stageDirectory) {
+  // Require a fresh directory so old photographs cannot remain.
+  await fs.mkdir(stageDirectory);
+
+  await fs.mkdir(path.join(stageDirectory, "gallery"));
+  await fs.mkdir(
+    path.join(stageDirectory, "assets/gallery"),
+    { recursive: true }
+  );
+
+  // One image may be referenced by more than one photo record.
+  const filenames = new Set(photos.map(photo => photo.file));
+
+  for (const filename of filenames) {
+    await fs.copyFile(
+      path.join(root, "assets/gallery", filename),
+      path.join(stageDirectory, "assets/gallery", filename)
+    );
+  }
+}
+
   const temporary = `${destination}.tmp`;
 
   try {
@@ -129,8 +168,9 @@ async function buildGallery() {
   }
 
   console.log(
-    `Generated gallery/photos.json: ` +
-    `${photos.length} published photographs.`
+    stageDirectory
+      ? `Staged ${photos.length} published photographs in ${stageDirectory}. Nothing deployed.`
+      : `Generated gallery/photos.json: ${photos.length} published photographs.`
   );
 }
 

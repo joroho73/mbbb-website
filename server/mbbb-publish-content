@@ -1,11 +1,12 @@
 #!/usr/bin/python3 -I
-"""Restricted SSH receiver. YAML schema validation runs in the content builder.
+"""Restricted SSH receiver for atomic MBBB content releases.
 
-SSH command: check | publish
-publish stdin: UTF-8 JSON {version:1, commit:<40 hex>, sequence:<positive int>,
-                         files:{"gigs/gigs.json":<text>, ...}}
-Only the two manifests and the YAML files they list are accepted.
+Accepts legacy protocol 1 (gigs/testimonials) and protocol 2 (adds gallery).
+Protocol 2 images are strict base64 with allowlisted names and signature checks.
+YAML validation and full image processing belong in the build step.
 """
+import base64
+import binascii
 import fcntl
 import hashlib
 import json
@@ -18,7 +19,8 @@ import sys
 import tempfile
 
 ROOT = Path('/srv/mbbb-content')
-MAX_UPLOAD = 10 * 1024 * 1024
+MAX_UPLOAD = 32 * 1024 * 1024
+MAX_IMAGE = 5 * 1024 * 1024
 MAX_FILE = 512 * 1024
 PATTERNS = {
     'gigs': re.compile(r'[A-Za-z0-9][A-Za-z0-9_-]*\.ya?ml', re.I),
@@ -44,15 +46,19 @@ def parse_json(text):
 
 
 def validate(raw):
-    require(len(raw) <= MAX_UPLOAD, 'Upload exceeds 10 MiB')
+    require(len(raw) <= MAX_UPLOAD, 'Upload exceeds 32 MiB')
     bundle = parse_json(raw.decode('utf-8'))
     require(isinstance(bundle, dict), 'Expected a JSON object')
-    require(set(bundle) == {'version', 'commit', 'sequence', 'files'}, 'Unexpected bundle fields')
-    require(type(bundle['version']) is int and bundle['version'] == 1, 'Unsupported version')
+    version = bundle.get('version')
+    require(type(version) is int and version in (1, 2), 'Unsupported version')
+    keys = {'version', 'commit', 'sequence', 'files'}
+    if version == 2:
+        keys.add('images')
+    require(set(bundle) == keys, 'Unexpected bundle fields')
     require(isinstance(bundle['commit'], str) and re.fullmatch(r'[0-9a-f]{40}', bundle['commit']), 'Invalid commit')
     require(type(bundle['sequence']) is int and 0 < bundle['sequence'] < 10**15, 'Invalid sequence')
     files = bundle['files']
-    require(isinstance(files, dict) and 2 <= len(files) <= 2002, 'Invalid file count')
+    require(isinstance(files, dict) and 2 <= len(files) <= 2003, 'Invalid file count')
     expected = set()
     for collection, pattern in PATTERNS.items():
         manifest = f'{collection}/{collection}.json'
@@ -69,11 +75,48 @@ def validate(raw):
             seen.add(name)
             anchors.add(anchor)
             expected.add(f'{collection}/{name}')
-    require(set(files) == expected, 'Files must exactly match both manifests')
+    if version == 2:
+        manifest = 'gallery/photos.json'
+        require(manifest in files and isinstance(files[manifest], str), 'Missing gallery manifest')
+        expected.add(manifest)
+        photos = parse_json(files[manifest])
+        require(isinstance(photos, list) and len(photos) <= 1000, 'Invalid gallery manifest')
+        images = bundle['images']
+        require(isinstance(images, dict) and len(images) <= 1000, 'Invalid images object')
+        expected_images = set()
+        for photo in photos:
+            require(isinstance(photo, dict), 'Invalid photo record')
+            require(set(photo) == {'title', 'file', 'alt', 'caption', 'photographer', 'use_on_homepage', 'published'}, 'Unexpected photo fields')
+            for field in ('title', 'alt'):
+                require(isinstance(photo[field], str) and photo[field].strip() and len(photo[field]) <= 8000, 'Missing or invalid photo ' + field)
+            for field in ('caption', 'photographer'):
+                require(isinstance(photo[field], str) and len(photo[field]) <= 8000, 'Invalid photo ' + field)
+            require(photo['published'] is True, 'Gallery contains an unpublished photo')
+            require(type(photo['use_on_homepage']) is bool, 'Invalid homepage flag')
+            name = photo['file']
+            require(isinstance(name, str) and len(name) <= 200 and re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]*\.(?:jpe?g|png|webp)', name, re.I), 'Invalid image filename')
+            expected_images.add('assets/gallery/' + name)
+        require(set(images) == expected_images, 'Images must exactly match gallery manifest')
+        for name, encoded in images.items():
+            require(isinstance(encoded, str) and len(encoded) <= 4 * ((MAX_IMAGE + 2) // 3), 'Invalid image encoding size')
+            try:
+                data = base64.b64decode(encoded, validate=True)
+            except (ValueError, binascii.Error):
+                raise ValueError('Invalid base64 image') from None
+            require(0 < len(data) <= MAX_IMAGE, 'Image exceeds 5 MiB or is empty')
+            suffix = name.rsplit('.', 1)[1].lower()
+            signature_ok = (
+                (suffix in ('jpg', 'jpeg') and data.startswith(b'\xff\xd8\xff')) or
+                (suffix == 'png' and data.startswith(b'\x89PNG\r\n\x1a\n')) or
+                (suffix == 'webp' and len(data) >= 12 and data[:4] == b'RIFF' and data[8:12] == b'WEBP')
+            )
+            require(signature_ok, 'Image signature does not match filename: ' + name)
+    require(set(files) == expected, 'Text files must exactly match manifests')
     for name, content in files.items():
         require(isinstance(content, str) and content.strip() and '\x00' not in content, 'Invalid file text: ' + name)
         require(len(content.encode('utf-8')) <= MAX_FILE, 'File exceeds 512 KiB: ' + name)
-    canonical = json.dumps(files, sort_keys=True, ensure_ascii=True, separators=(',', ':')).encode('ascii')
+    digest_source = files if version == 1 else {'files': files, 'images': bundle['images']}
+    canonical = json.dumps(digest_source, sort_keys=True, ensure_ascii=True, separators=(',', ':')).encode('ascii')
     digest = hashlib.sha256(canonical).hexdigest()
     return bundle, digest
 
@@ -100,12 +143,14 @@ def publish(raw, root=ROOT):
         stage = Path(tempfile.mkdtemp(prefix='.upload-', dir=root))
         pointer = stage / 'current-link'
         try:
-            # mkdtemp is private until every file is complete.
-            for collection in PATTERNS:
-                (stage / collection).mkdir(mode=0o755)
-            for name, content in bundle['files'].items():
+            # All paths were allowlisted before creating public files.
+            payloads = {name: text.encode('utf-8') for name, text in bundle['files'].items()}
+            payloads.update({name: base64.b64decode(encoded, validate=True)
+                             for name, encoded in bundle.get('images', {}).items()})
+            for name, content in payloads.items():
                 target = stage / name
-                with target.open('x', encoding='utf-8', newline='') as output:
+                target.parent.mkdir(mode=0o755, parents=True, exist_ok=True)
+                with target.open('xb') as output:
                     output.write(content)
                     output.flush()
                     os.fsync(output.fileno())
@@ -116,15 +161,15 @@ def publish(raw, root=ROOT):
                 # A completed upload may remain after interruption before activation.
                 require(not destination.is_symlink(), 'Invalid release directory')
                 require(parse_json((destination / 'release.json').read_text()) == metadata, 'Release already exists with different content')
-                for name, content in bundle['files'].items():
-                    require((destination / name).read_bytes() == content.encode('utf-8'), 'Existing release is incomplete')
+                for name, content in payloads.items():
+                    require((destination / name).read_bytes() == content, 'Existing release is incomplete')
             else:
                 stage.chmod(0o755)
                 stage.rename(destination)
                 stage = Path(tempfile.mkdtemp(prefix='.activate-', dir=root))
                 pointer = stage / 'current-link'
             pointer.symlink_to('releases/' + release)
-            # One rename switches both collections together. Retain old releases.
+            # One rename switches all content together. Retain old releases.
             os.replace(pointer, current)
         finally:
             shutil.rmtree(stage, ignore_errors=True)
@@ -137,7 +182,7 @@ def main():
     command = os.environ.get('SSH_ORIGINAL_COMMAND', '')
     if command == 'check':
         require(ROOT.is_dir() and os.access(ROOT, os.W_OK | os.X_OK), 'Content directory is not writable')
-        print('MBBB content receiver ready (protocol 1). No content changed.')
+        print('MBBB content receiver ready (protocols 1 and 2). No content changed.')
     elif command == 'publish':
         print(publish(sys.stdin.buffer.read(MAX_UPLOAD + 1)))
     else:
