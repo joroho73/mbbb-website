@@ -79,7 +79,12 @@
           src: imagePath(record.file),
           thumbnail: imagePath(record.thumbnail || record.file),
           alt: record.alt.trim(),
-          caption: typeof record.caption === "string" ? record.caption : record.alt.trim()
+          caption: [
+            typeof record.caption === "string" ? record.caption.trim() : "",
+            typeof record.photographer === "string" && record.photographer.trim()
+              ? `Photo: ${record.photographer.trim()}`
+              : ""
+          ].filter(Boolean).join(" — ")
         };
       });
 
