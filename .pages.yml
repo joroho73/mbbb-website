@@ -1,3 +1,8 @@
+media:
+  input: assets/gallery
+  output: /assets/gallery
+  extensions: [jpg, jpeg, png, webp]
+
 content:
   - name: gigs
     label: Gigs
@@ -124,3 +129,57 @@ content:
         type: boolean
         default: false
         description: "Switch on when this testimonial is ready to appear on the website."
+
+  - name: gallery
+    label: Gallery
+    type: collection
+    path: gallery/photos
+    format: yaml
+    subfolders: false
+    filename: "{fields.title}.yml"
+
+    view:
+      primary: title
+      sort: title
+      order: asc
+
+    fields:
+      - name: title
+        label: Photo title
+        type: string
+        required: true
+        description: "A short, unique name to identify this photograph."
+
+      - name: image
+        label: Photograph
+        type: image
+        required: true
+        description: "Upload a photograph or select an existing image."
+
+      - name: alt
+        label: Alternative text
+        type: string
+        required: true
+        description: "Briefly describe what is visible for someone who cannot see the photograph."
+
+      - name: caption
+        label: Caption
+        type: text
+        description: "Optional text displayed with the enlarged photograph."
+
+      - name: photographer
+        label: Photographer credit
+        type: string
+        description: "Optional photographer name or credit."
+
+      - name: use_on_homepage
+        label: Use on homepage
+        type: boolean
+        default: false
+        description: "Include this photograph in the random homepage selection. Choose a landscape image that suits a wide crop."
+
+  - name: published
+        label: Published
+        type: boolean
+        default: false
+        description: "Show this photograph in the gallery. It must also be published to appear on the homepage."
