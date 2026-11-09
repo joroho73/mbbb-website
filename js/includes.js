@@ -42,7 +42,7 @@ async function setupMenuToggle() {
     menuToggle.setAttribute("aria-label", isOpen ? "Close menu" : "Open menu");
   });
 
-  siteHeader.querySelectorAll("#main-navigation a").forEach((link) => {
+  siteHeader.querySelectorAll("#main-navigation a, .header-cta").forEach((link) => {
   link.addEventListener("click", () => {
     siteHeader.classList.remove("menu-open");
     menuToggle.setAttribute("aria-expanded", "false");
