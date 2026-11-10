@@ -14,7 +14,6 @@ npm run content:build
 echo "Deploying Melvin Beddow Big Band demo website..."
 
 rsync -avz \
-    --dry-run \
     --itemize-changes \
     --exclude '*.bak' \
     --exclude '*.env' \
