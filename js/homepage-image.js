@@ -27,7 +27,7 @@
         photo.published === true &&
         photo.use_on_homepage === true &&
         typeof photo.file === "string" &&
-        /^[a-zA-Z0-9][a-zA-Z0-9_.-]*\.(jpe?g|png|webp)$/i.test(photo.file) &&
+        /^[a-zA-Z0-9][a-zA-Z0-9_. -]*\.(jpe?g|png|webp)$/i.test(photo.file) &&
         typeof photo.alt === "string" &&
         photo.alt.trim()
       );

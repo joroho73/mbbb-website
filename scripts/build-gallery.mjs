@@ -89,8 +89,8 @@ async function buildGallery() {
       const image = record.image.trim();
 
       // Accept an image directly inside our gallery image folder.
-      const match = image.match(
-        /^\/assets\/gallery\/([a-zA-Z0-9][a-zA-Z0-9_.-]*\.(?:jpe?g|png|webp))$/i
+      const match = image.match(  
+        /^\/assets\/gallery\/([a-zA-Z0-9][a-zA-Z0-9_. -]*\.(?:jpe?g|png|webp))$/i
       );
 
       if (!match) {

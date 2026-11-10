@@ -11,8 +11,8 @@
   {
     "title": "Gallery photo 738625288_1408156954701821_6418066800863244433_n.jpg",
     "file": "738625288_1408156954701821_6418066800863244433_n.jpg",
-    "alt": "alttext",
-    "caption": "alttext",
+    "alt": "Melvin Beddow Big Band",
+    "caption": "Melvin Beddow Big Band",
     "photographer": "",
     "use_on_homepage": false,
     "published": true
@@ -38,8 +38,8 @@
   {
     "title": "Gallery photo 789595626_1458688162982033_4701834921220130973_n.jpg",
     "file": "789595626_1458688162982033_4701834921220130973_n.jpg",
-    "alt": "alttext",
-    "caption": "alttext",
+    "alt": "Melvin Beddow Big Band - Keyboard Player",
+    "caption": "Melvin Beddow Big Band - Keyboard Player",
     "photographer": "",
     "use_on_homepage": false,
     "published": true
@@ -101,10 +101,10 @@
   {
     "title": "Gallery photo 793203844_1458688096315373_3385672975680816311_n.jpg",
     "file": "793203844_1458688096315373_3385672975680816311_n.jpg",
-    "alt": "alttext",
-    "caption": "alttext",
+    "alt": "Melvin Beddow Big Band - Brass Players",
+    "caption": "Melvin Beddow Big Band - Brass Players",
     "photographer": "",
-    "use_on_homepage": false,
+    "use_on_homepage": true,
     "published": true
   },
   {
@@ -119,10 +119,10 @@
   {
     "title": "Gallery photo 798729438_1464521935731989_2720468201928392134_n.jpg",
     "file": "798729438_1464521935731989_2720468201928392134_n.jpg",
-    "alt": "alttext",
-    "caption": "alttext",
+    "alt": "Melvin Beddow Big Band and Jazz Singer Ruby Robinson",
+    "caption": "Melvin Beddow Big Band and Jazz Singer Ruby Robinson",
     "photographer": "",
-    "use_on_homepage": false,
+    "use_on_homepage": true,
     "published": true
   },
   {
@@ -146,10 +146,64 @@
   {
     "title": "Gallery photo 821665086_1474818064702376_8656269587525259362_n.jpg",
     "file": "821665086_1474818064702376_8656269587525259362_n.jpg",
-    "alt": "alttext",
-    "caption": "alttext",
+    "alt": "Melvin Beddow Big Band - Trumpters",
+    "caption": "Melvin Beddow Big Band - Trumpters",
+    "photographer": "",
+    "use_on_homepage": true,
+    "published": true
+  },
+  {
+    "title": "MBBB - Vocalist Ruby Robinson",
+    "file": "vox.jpg",
+    "alt": "MBBB - Vocalist Ruby Robinson",
+    "caption": "MBBB - Vocalist Ruby Robinson",
     "photographer": "",
     "use_on_homepage": false,
+    "published": true
+  },
+  {
+    "title": "Melvin Beddow Big Band - Full Band",
+    "file": "645360515_1302053631978821_1561384269192364225_n.jpg",
+    "alt": "Melvin Beddow Big Band - Full Band",
+    "caption": "Melvin Beddow Big Band - Full Band",
+    "photographer": "",
+    "use_on_homepage": false,
+    "published": true
+  },
+  {
+    "title": "Melvin Beddow Big Band - Sax Player",
+    "file": "Melvin Beddow Big Band - Chelmsford Theatre Studio - Full Resolution-16.jpg",
+    "alt": "Melvin Beddow Big Band - Sax Soloist",
+    "caption": "Melvin Beddow Big Band - Sax Soloist",
+    "photographer": "",
+    "use_on_homepage": false,
+    "published": true
+  },
+  {
+    "title": "Melvin Beddow Big Band - Sax Players",
+    "file": "sax.jpg",
+    "alt": "Melvin Beddow Big Band - Sax Players",
+    "caption": "Melvin Beddow Big Band - Sax Players",
+    "photographer": "",
+    "use_on_homepage": false,
+    "published": true
+  },
+  {
+    "title": "Melvin Beddow Big Band - Saxophone Players",
+    "file": "712469536_1379256354258548_3636841141611575873_n.jpg",
+    "alt": "Melvin Beddow Big Band - Saxophone Players",
+    "caption": "Melvin Beddow Big Band - Saxophone Players",
+    "photographer": "",
+    "use_on_homepage": true,
+    "published": true
+  },
+  {
+    "title": "Melvin Beddow Big Band - Saxophone Section",
+    "file": "651005447_1309914057859445_5795801479446274383_n.jpg",
+    "alt": "Melvin Beddow Big Band - Saxophone Section",
+    "caption": "Melvin Beddow Big Band - Saxophone Section",
+    "photographer": "",
+    "use_on_homepage": true,
     "published": true
   },
   {
@@ -159,6 +213,15 @@
     "caption": "Melvin Beddow Big Band - Solo Trumpeter",
     "photographer": "",
     "use_on_homepage": true,
+    "published": true
+  },
+  {
+    "title": "Ruby Robinson - Jazz Singer - Green Dress",
+    "file": "Ruby-Robinson-Jazz-Singer-Green_Dress.jpg",
+    "alt": "Ruby Robinson - Jazz Singer - Green Dress",
+    "caption": "Ruby Robinson - Jazz Singer - Green Dress",
+    "photographer": "",
+    "use_on_homepage": false,
     "published": true
   }
 ]
