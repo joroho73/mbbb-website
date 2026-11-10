@@ -65,8 +65,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           latest_sha=$(gh api \
-            "repos/$GITHUB_REPOSITORY/git/ref/heads/$GITHUB_REF_NAME"
-            --jq '.object.sha')
+            "repos/$GITHUB_REPOSITORY/git/ref/heads/$GITHUB_REF_NAME" --jq '.object.sha')
 
           if [[ "$latest_sha" == "$GITHUB_SHA" ]]; then
             echo "publish=true" >> "$GITHUB_OUTPUT"
