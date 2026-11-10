@@ -19,7 +19,7 @@ import sys
 import tempfile
 import time
 
-ROOT = Path('/srv/mbbb-content')
+ROOT = Path('/home/dcshosting/mbbb-content')
 MAX_UPLOAD = 32 * 1024 * 1024
 MAX_IMAGE = 5 * 1024 * 1024
 MAX_FILE = 512 * 1024

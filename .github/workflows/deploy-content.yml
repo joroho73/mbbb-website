@@ -1,20 +1,20 @@
-name: Publish CMS content
+name: Publish CMS content — Bobcat preview
 
 on:
   push:
-    branches: [main]
+    branches: [migration/mythic-web-hosting]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: mbbb-content-publication
+  group: mbbb-bobcat-content-publication
   cancel-in-progress: false
 
 jobs:
   publish:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/migration/mythic-web-hosting'
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -65,7 +65,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           latest_sha=$(gh api \
-            "repos/$GITHUB_REPOSITORY/git/ref/heads/main" \
+            "repos/$GITHUB_REPOSITORY/git/ref/heads/$GITHUB_REF_NAME"
             --jq '.object.sha')
 
           if [[ "$latest_sha" == "$GITHUB_SHA" ]]; then
@@ -78,11 +78,11 @@ jobs:
       - name: Publish through restricted SSH receiver
         if: steps.latest.outputs.publish == 'true'
         env:
-          MBBB_SSH_HOST: ${{ secrets.MBBB_SSH_HOST }}
-          MBBB_SSH_PORT: ${{ secrets.MBBB_SSH_PORT }}
-          MBBB_SSH_USER: ${{ secrets.MBBB_SSH_USER }}
-          MBBB_SSH_PRIVATE_KEY: ${{ secrets.MBBB_SSH_PRIVATE_KEY }}
-          MBBB_SSH_KNOWN_HOSTS: ${{ secrets.MBBB_SSH_KNOWN_HOSTS }}
+          MBBB_SSH_HOST: ${{ secrets.BOBCAT_SSH_HOST }}
+          MBBB_SSH_PORT: ${{ secrets.BOBCAT_SSH_PORT }}
+          MBBB_SSH_USER: ${{ secrets.BOBCAT_SSH_USER }}
+          MBBB_SSH_PRIVATE_KEY: ${{ secrets.BOBCAT_SSH_PRIVATE_KEY }}
+          MBBB_SSH_KNOWN_HOSTS: ${{ secrets.BOBCAT_SSH_KNOWN_HOSTS }}
         run: |
           : "${MBBB_SSH_HOST:?Missing MBBB_SSH_HOST}"
           : "${MBBB_SSH_PORT:?Missing MBBB_SSH_PORT}"
@@ -128,7 +128,7 @@ jobs:
               )
           )
 
-          base = "https://mbbb.dcsmail.uk/content"
+          base = "https://mbbb-preview.dcsmail.uk/content"
           expected = f"{bundle['sequence']}-{bundle['commit']}"
 
           request = Request(
@@ -174,11 +174,11 @@ jobs:
       - name: Clean up old releases after verification
         if: steps.latest.outputs.publish == 'true'
         env:
-          MBBB_SSH_HOST: ${{ secrets.MBBB_SSH_HOST }}
-          MBBB_SSH_PORT: ${{ secrets.MBBB_SSH_PORT }}
-          MBBB_SSH_USER: ${{ secrets.MBBB_SSH_USER }}
-          MBBB_SSH_PRIVATE_KEY: ${{ secrets.MBBB_SSH_PRIVATE_KEY }}
-          MBBB_SSH_KNOWN_HOSTS: ${{ secrets.MBBB_SSH_KNOWN_HOSTS }}
+          MBBB_SSH_HOST: ${{ secrets.BOBCAT_SSH_HOST }}
+          MBBB_SSH_PORT: ${{ secrets.BOBCAT_SSH_PORT }}
+          MBBB_SSH_USER: ${{ secrets.BOBCAT_SSH_USER }}
+          MBBB_SSH_PRIVATE_KEY: ${{ secrets.BOBCAT_SSH_PRIVATE_KEY }}
+          MBBB_SSH_KNOWN_HOSTS: ${{ secrets.BOBCAT_SSH_KNOWN_HOSTS }}
         run: |
           : "${MBBB_SSH_HOST:?Missing MBBB_SSH_HOST}"
           : "${MBBB_SSH_PORT:?Missing MBBB_SSH_PORT}"
