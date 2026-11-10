@@ -34,6 +34,10 @@
 
     <script>
       document.documentElement.classList.add("homepage-image-pending");
+
+      window.setTimeout(() => {
+        document.documentElement.classList.remove("homepage-image-pending");
+      }, 8000);
     </script>
 
     <link rel="stylesheet" href="/css/styles.css" />

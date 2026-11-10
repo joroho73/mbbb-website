@@ -45,6 +45,11 @@
       preload.src = source;
       await preload.decode();
 
+      // If the fallback is already visible, keep it for this page load.
+      if (!document.documentElement.classList.contains("homepage-image-pending")) {
+        return;
+      }
+
       hero.alt = selected.alt.trim();
       hero.src = source;
     } catch (error) {

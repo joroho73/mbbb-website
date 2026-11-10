@@ -1,0 +1,6 @@
+<IfModule mod_headers.c>
+    <FilesMatch "\.(html|css|js)$">
+        Header onsuccess unset Cache-Control
+        Header always set Cache-Control "no-cache"
+    </FilesMatch>
+</IfModule>
