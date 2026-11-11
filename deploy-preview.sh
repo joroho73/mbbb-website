@@ -48,7 +48,7 @@ rsync -avz "${RSYNC_OPTIONS[@]}" \
     --exclude 'README.md' \
     --exclude '/INSTALL.md' \
     --exclude '__pycache__/' \
-    --exclude 'deploy-command.txt' \
+    --exclude 'developer-notes.md' \
     --exclude 'deploy.sh' \
     --exclude 'deploy-preview.sh' \
     --exclude 'node_modules/' \

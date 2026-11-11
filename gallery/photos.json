@@ -83,10 +83,10 @@
   {
     "title": "Gallery photo 793125760_1458688076315375_5308364808549947006_n.jpg",
     "file": "793125760_1458688076315375_5308364808549947006_n.jpg",
-    "alt": "alttext",
-    "caption": "alttext",
+    "alt": "MBBB - Ruby Robinson Jazz Singer",
+    "caption": "MBBB - Ruby Robinson Jazz Singer",
     "photographer": "",
-    "use_on_homepage": false,
+    "use_on_homepage": true,
     "published": true
   },
   {
@@ -153,6 +153,42 @@
     "published": true
   },
   {
+    "title": "Malvin Beddow Big Band - Trumpet Player at Rest",
+    "file": "Melvin Beddow Big Band - Chelmsford Theatre Studio - Full Resolution-63.jpg",
+    "alt": "Malvin Beddow Big Band - Trumpet Player at Rest",
+    "caption": "Malvin Beddow Big Band - Trumpet Player at Rest",
+    "photographer": "",
+    "use_on_homepage": true,
+    "published": true
+  },
+  {
+    "title": "MBBB - Angel Eyes - Jazz Score",
+    "file": "angel_eyes_score.jpg",
+    "alt": "MBBB - Angel Eyes - Jazz Score",
+    "caption": "MBBB - Angel Eyes - Jazz Score",
+    "photographer": "",
+    "use_on_homepage": false,
+    "published": true
+  },
+  {
+    "title": "MBBB - Lil Darlin - Jazz Score",
+    "file": "lil_darlin_score.jpg",
+    "alt": "MBBB - Lil Darlin - Jazz Score",
+    "caption": "MBBB - Lil Darlin - Jazz Score",
+    "photographer": "",
+    "use_on_homepage": false,
+    "published": true
+  },
+  {
+    "title": "MBBB - Moonlight Serenade - Jazz Score",
+    "file": "moonlight_serenede_score.jpg",
+    "alt": "MBBB - Moonlight Serenade - Jazz Score",
+    "caption": "MBBB - Moonlight Serenade - Jazz Score",
+    "photographer": "",
+    "use_on_homepage": false,
+    "published": true
+  },
+  {
     "title": "MBBB - Vocalist Ruby Robinson",
     "file": "vox.jpg",
     "alt": "MBBB - Vocalist Ruby Robinson",
@@ -162,12 +198,21 @@
     "published": true
   },
   {
+    "title": "Melvin Beddow Big Band - Acoustic Bass Player",
+    "file": "Melvin Beddow Big Band - Chelmsford Theatre Studio - Full Resolution-64.jpg",
+    "alt": "Melvin Beddow Big Band - Acoustic Bass Player",
+    "caption": "Melvin Beddow Big Band - Acoustic Bass Player",
+    "photographer": "",
+    "use_on_homepage": true,
+    "published": true
+  },
+  {
     "title": "Melvin Beddow Big Band - Full Band",
     "file": "645360515_1302053631978821_1561384269192364225_n.jpg",
     "alt": "Melvin Beddow Big Band - Full Band",
     "caption": "Melvin Beddow Big Band - Full Band",
     "photographer": "",
-    "use_on_homepage": false,
+    "use_on_homepage": true,
     "published": true
   },
   {
@@ -176,7 +221,7 @@
     "alt": "Melvin Beddow Big Band - Sax Soloist",
     "caption": "Melvin Beddow Big Band - Sax Soloist",
     "photographer": "",
-    "use_on_homepage": false,
+    "use_on_homepage": true,
     "published": true
   },
   {
@@ -213,6 +258,33 @@
     "caption": "Melvin Beddow Big Band - Solo Trumpeter",
     "photographer": "",
     "use_on_homepage": true,
+    "published": true
+  },
+  {
+    "title": "Melvin Beddow Big Band - Trombone Player",
+    "file": "Melvin Beddow Big Band - Chelmsford Theatre Studio - Full Resolution-49.jpg",
+    "alt": "Melvin Beddow Big Band - Trombone Player",
+    "caption": "Melvin Beddow Big Band - Trombone Player",
+    "photographer": "",
+    "use_on_homepage": true,
+    "published": true
+  },
+  {
+    "title": "Melvin Beddow Big Band Trumpeter with Mute",
+    "file": "Melvin Beddow Big Band - Chelmsford Theatre Studio - Full Resolution-30.jpg",
+    "alt": "Melvin Beddow Big Band Trumpeter with Mute",
+    "caption": "Melvin Beddow Big Band Trumpeter with Mute",
+    "photographer": "",
+    "use_on_homepage": false,
+    "published": true
+  },
+  {
+    "title": "Melvin Beddow Big Band - Whole Band picture",
+    "file": "Melvin Beddow Big Band - Chelmsford Theatre Studio - Full Resolution-74.jpg",
+    "alt": "Melvin Beddow Big Band - Whole Band picture",
+    "caption": "Melvin Beddow Big Band - Whole Band picture",
+    "photographer": "",
+    "use_on_homepage": false,
     "published": true
   },
   {
