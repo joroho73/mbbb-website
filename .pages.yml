@@ -148,7 +148,6 @@ content:
       - name: title
         label: Photo title
         type: string
-        hidden: true
         required: true
         description: "A short name to identify this photo."
 
