@@ -1,4 +1,0 @@
-cd /path-to-project
-ssh -MNf mbbb
-enter passphrase from Bitwarden
-bash deploy.sh
