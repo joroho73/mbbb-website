@@ -2,6 +2,7 @@ media:
   input: assets/gallery
   output: /assets/gallery
   extensions: [jpg, jpeg, png, webp]
+  rename: safe
 
 content:
   - name: gigs
@@ -144,23 +145,27 @@ content:
       order: asc
 
     fields:
-      - name: title
-        label: Photo title
-        type: string
-        required: true
-        description: "A short, unique name to identify this photograph."
-
-      - name: image
-        label: Photograph
-        type: image
-        required: true
-        description: "Upload a photograph or select an existing image."
-
       - name: caption
         label: Description
         type: text
         required: true
         description: "Briefly describe what the photograph shows. Used as the gallery caption and alternative text."
+
+      - name: title
+        label: Photo title
+        type: string
+        hidden: true
+        required: false
+        description: "A short, unique name to identify this photograph."
+
+      - name: image
+        label: Photo
+        type: image
+        required: true
+        options:
+          extensions: [jpg, jpeg, png, webp]
+          rename: safe
+        description: "Upload a photograph or select an existing image."
 
       - name: photographer
         label: Photographer credit
