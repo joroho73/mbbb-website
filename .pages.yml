@@ -137,7 +137,7 @@ content:
     path: gallery/photos
     format: yaml
     subfolders: false
-    filename: "{fields.title}.yml"
+    filename: "{fields.caption}.yml"
 
     view:
       primary: title
