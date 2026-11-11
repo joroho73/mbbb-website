@@ -147,7 +147,7 @@ content:
     fields:
       - name: caption
         label: Description
-        type: text
+        type: string
         required: true
         description: "Briefly describe what the photograph shows. Used as the gallery caption and alternative text."
 
