@@ -34,6 +34,10 @@
 
     <script>
       document.documentElement.classList.add("homepage-image-pending");
+
+      window.setTimeout(() => {
+        document.documentElement.classList.remove("homepage-image-pending");
+      }, 8000);
     </script>
 
     <link rel="stylesheet" href="/css/styles.css" />
@@ -68,15 +72,15 @@
         </div>
 
         <div class="hero-copy">
-          <p class="eyebrow">A full big band experience</p>
+          <p class="eyebrow">MBBB - Melvin Beddow Big Band</p>
           <h1 class="page-title" id="hero-title">
-            After dark,
+            Live jazz,
             <br />
-            <em>the music comes alive.</em>
+            <em>a full party experience.</em>
           </h1>
           <p class="intro">
-            Classic swing, irresistible rhythm and brilliant vocalists -
-            performed by one of Essex’s best-loved big bands.
+            Classic swing, full brass section, brilliant vocalists - performed
+            by one of Essex’s best-loved big bands.
           </p>
 
           <div class="hero-actions">
@@ -101,7 +105,7 @@
         <span class="quote-mark" aria-hidden="true">“</span>
         <blockquote>
           <p class="quote-text">
-            MBBB were just what we wanted! Excellent, tight playing and beyond
+            MBBB were just what we wanted! Excellent music and beyond
             expectation!
           </p>
         </blockquote>
@@ -130,12 +134,12 @@
           </p>
           <p>
             With talented vocalists and a wide repertoire, we bring music to
-            suit the occasion - from elegant swing standards to jive, jazz, rock
-            & roll and party favourites.
+            your occasion - from elegant swing standards to jive, jazz, up to
+            the minute tunes and party favourites.
           </p>
           <p class="action-row">
             <a class="text-link" href="#enquiries">
-              Talk to us about your event
+              Tell us about your event
               <span aria-hidden="true">↗</span>
             </a>
           </p>
@@ -155,27 +159,27 @@
         <div class="sound-copy">
           <p class="eyebrow highlight">Our Music</p>
           <h2 class="section-title section-title--compact" id="sound-title">
-            From supper-club swing to a packed dance floor.
+            From elegant swing to a packed dance floor.
           </h2>
 
           <div class="genres" aria-label="Musical styles">
             <span>Jazz</span>
             <span>Swing</span>
             <span>Jive</span>
-            <span>Rock n roll</span>
+            <span>Modern classics</span>
             <span>Party hits</span>
           </div>
 
           <p>
-            Rich brass, driving rhythm and vocals with real personality. It is
-            timeless big band music, played with energy for audiences today.
+            Rich brass, driving rhythm and vocals with real personality. MBBB
+            delivers timeless music, played with energy for audiences today.
           </p>
 
           <a
             class="button button-outline"
             href="https://www.youtube.com/watch?v=34i4DNU1kVw"
           >
-            Hear the band
+            Hear MBBB in action
             <span aria-hidden="true">▶</span>
           </a>
         </div>
@@ -190,11 +194,11 @@
             <em>for your diary.</em>
           </h2>
 
-          <p>Come and hear the band live. More dates will be announced soon.</p>
+          <p>Come and hear us play live.</p>
 
           <p class="action-row">
             <a class="text-link" href="/gigs/">
-              View all gigs
+              View all our upcoming gigs
               <span aria-hidden="true">↗</span>
             </a>
           </p>
@@ -259,9 +263,9 @@
         <div class="enquiry-intro">
           <p class="eyebrow highlight">Make an enquiry</p>
           <h2 class="section-title" id="enquiries-title">
-            Bring the big band
+            Big band at
             <br />
-            <em>to your event.</em>
+            <em>your event?</em>
           </h2>
 
           <p>
@@ -286,7 +290,7 @@
         <form
           class="enquiry-form"
           id="enquiry-form"
-          action="/api/contact"
+          action="/api/contact.php"
           method="post"
         >
           <div class="field-row">

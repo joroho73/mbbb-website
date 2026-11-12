@@ -74,7 +74,7 @@ def main():
         if (
             not isinstance(filename, str)
             or not re.fullmatch(
-                r"[A-Za-z0-9][A-Za-z0-9_.-]*\.(?:jpe?g|png|webp)",
+                r"[A-Za-z0-9][A-Za-z0-9_. -]*\.(?:jpe?g|png|webp)",
                 filename,
                 re.IGNORECASE,
             )

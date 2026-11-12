@@ -27,7 +27,7 @@
         photo.published === true &&
         photo.use_on_homepage === true &&
         typeof photo.file === "string" &&
-        /^[a-zA-Z0-9][a-zA-Z0-9_.-]*\.(jpe?g|png|webp)$/i.test(photo.file) &&
+        /^[a-zA-Z0-9][a-zA-Z0-9_. -]*\.(jpe?g|png|webp)$/i.test(photo.file) &&
         typeof photo.alt === "string" &&
         photo.alt.trim()
       );
@@ -44,6 +44,11 @@
       const preload = new Image();
       preload.src = source;
       await preload.decode();
+
+      // If the fallback is already visible, keep it for this page load.
+      if (!document.documentElement.classList.contains("homepage-image-pending")) {
+        return;
+      }
 
       hero.alt = selected.alt.trim();
       hero.src = source;

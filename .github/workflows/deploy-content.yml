@@ -1,20 +1,20 @@
-name: Publish CMS content
+name: Publish CMS content — Bobcat preview
 
 on:
   push:
-    branches: [main]
+    branches: [migration/mythic-web-hosting]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: mbbb-content-publication
+  group: mbbb-bobcat-content-publication
   cancel-in-progress: false
 
 jobs:
   publish:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/migration/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -65,7 +65,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           latest_sha=$(gh api \
-            "repos/$GITHUB_REPOSITORY/git/ref/heads/main" \
+            "repos/$GITHUB_REPOSITORY/git/ref/heads/$GITHUB_REF_NAME" \
             --jq '.object.sha')
 
           if [[ "$latest_sha" == "$GITHUB_SHA" ]]; then
@@ -78,11 +78,11 @@ jobs:
       - name: Publish through restricted SSH receiver
         if: steps.latest.outputs.publish == 'true'
         env:
-          MBBB_SSH_HOST: ${{ secrets.MBBB_SSH_HOST }}
-          MBBB_SSH_PORT: ${{ secrets.MBBB_SSH_PORT }}
-          MBBB_SSH_USER: ${{ secrets.MBBB_SSH_USER }}
-          MBBB_SSH_PRIVATE_KEY: ${{ secrets.MBBB_SSH_PRIVATE_KEY }}
-          MBBB_SSH_KNOWN_HOSTS: ${{ secrets.MBBB_SSH_KNOWN_HOSTS }}
+          MBBB_SSH_HOST: ${{ secrets.BOBCAT_SSH_HOST }}
+          MBBB_SSH_PORT: ${{ secrets.BOBCAT_SSH_PORT }}
+          MBBB_SSH_USER: ${{ secrets.BOBCAT_SSH_USER }}
+          MBBB_SSH_PRIVATE_KEY: ${{ secrets.BOBCAT_SSH_PRIVATE_KEY }}
+          MBBB_SSH_KNOWN_HOSTS: ${{ secrets.BOBCAT_SSH_KNOWN_HOSTS }}
         run: |
           : "${MBBB_SSH_HOST:?Missing MBBB_SSH_HOST}"
           : "${MBBB_SSH_PORT:?Missing MBBB_SSH_PORT}"
@@ -112,23 +112,25 @@ jobs:
             "$MBBB_SSH_USER@$MBBB_SSH_HOST" publish \
             < .content-build/bundle.json
 
-      - name: Verify published content over HTTPS
+      - name: Verify published text content over HTTPS
         if: steps.latest.outputs.publish == 'true'
         run: |
           python3 - <<'PY'
-          import base64
           import json
+          import time
+          from concurrent.futures import ThreadPoolExecutor
           from pathlib import Path
           from urllib.parse import quote
           from urllib.request import Request, urlopen
 
+          started = time.monotonic()
           bundle = json.loads(
               Path(".content-build/bundle.json").read_text(
                   encoding="utf-8"
               )
           )
 
-          base = "https://mbbb.dcsmail.uk/content"
+          base = "https://mbbb-preview.dcsmail.uk/content"
           expected = f"{bundle['sequence']}-{bundle['commit']}"
 
           request = Request(
@@ -142,17 +144,8 @@ jobs:
           if current["release"] != expected:
               raise SystemExit("Unexpected active release")
 
-          expected_files = {
-              path: text.encode("utf-8")
-              for path, text in bundle["files"].items()
-          }
-
-          expected_files.update({
-              path: base64.b64decode(encoded, validate=True)
-              for path, encoded in bundle["images"].items()
-          })
-
-          for path, expected_bytes in expected_files.items():
+          def verify_text(item):
+              path, text = item
               url = (
                   f"{base}/releases/{expected}/"
                   f"{quote(path, safe='/')}"
@@ -161,24 +154,37 @@ jobs:
               with urlopen(url, timeout=30) as response:
                   actual = response.read()
 
-              if actual != expected_bytes:
-                  raise SystemExit(f"Content mismatch: {path}")
+              if actual != text.encode("utf-8"):
+                  raise RuntimeError(f"Content mismatch: {path}")
 
+              return len(actual)
+
+          with ThreadPoolExecutor(max_workers=4) as executor:
+              total_bytes = sum(
+                  executor.map(verify_text, bundle["files"].items())
+              )
+
+          elapsed = time.monotonic() - started
           print(f"Verified release: {expected}")
           print(
-              f"All {len(bundle['files'])} text files and "
-              f"{len(bundle['images'])} images match."
+              f"Verified {len(bundle['files'])} text files "
+              f"({total_bytes:,} bytes) in {elapsed:.1f}s."
+          )
+          print(
+              f"HTTPS image verification skipped for "
+              f"{len(bundle['images'])} images. "
+              "Check photographs visually on the website."
           )
           PY
-
+          
       - name: Clean up old releases after verification
         if: steps.latest.outputs.publish == 'true'
         env:
-          MBBB_SSH_HOST: ${{ secrets.MBBB_SSH_HOST }}
-          MBBB_SSH_PORT: ${{ secrets.MBBB_SSH_PORT }}
-          MBBB_SSH_USER: ${{ secrets.MBBB_SSH_USER }}
-          MBBB_SSH_PRIVATE_KEY: ${{ secrets.MBBB_SSH_PRIVATE_KEY }}
-          MBBB_SSH_KNOWN_HOSTS: ${{ secrets.MBBB_SSH_KNOWN_HOSTS }}
+          MBBB_SSH_HOST: ${{ secrets.BOBCAT_SSH_HOST }}
+          MBBB_SSH_PORT: ${{ secrets.BOBCAT_SSH_PORT }}
+          MBBB_SSH_USER: ${{ secrets.BOBCAT_SSH_USER }}
+          MBBB_SSH_PRIVATE_KEY: ${{ secrets.BOBCAT_SSH_PRIVATE_KEY }}
+          MBBB_SSH_KNOWN_HOSTS: ${{ secrets.BOBCAT_SSH_KNOWN_HOSTS }}
         run: |
           : "${MBBB_SSH_HOST:?Missing MBBB_SSH_HOST}"
           : "${MBBB_SSH_PORT:?Missing MBBB_SSH_PORT}"

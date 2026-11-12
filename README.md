@@ -1,342 +1,233 @@
 # Melvin Beddow Big Band website
 
-Static website for the Melvin Beddow Big Band (MBBB), developed by Dunmow Computer Services (DCS). The site promotes performances, shares audience testimonials and invites booking enquiries.
+Static HTML, CSS and JavaScript website maintained by Dunmow Computer Services.
+Repository: https://github.com/joroho73/mbbb-website
 
-Last updated: 21 October 2026.
+Updated 10 November 2026. This describes the migration stage, not a completed production cutover.
 
-## Project details
+## Environments and branches
 
-| Item | Details |
-| --- | --- |
-| Repository | https://github.com/joroho73/mbbb-website |
-| Working branch | `main` — currently maintained by one developer |
-| Demo website | https://mbbb.dcsmail.uk |
-| Demo hosting | Mythic Beasts VPS, Ubuntu 24.04, Caddy |
-| Website root on VPS | `/srv/www/mbbb/` |
-| Website deployment user | `websites` (non-sudo) |
-| SSH alias | `mbbb` |
-| Demo mailbox | `mbbb@dcsmail.uk` |
-| Production hosting | Not yet decided |
+| Branch | Website | Hosting |
+| --- | --- | --- |
+| main | https://mbbb.dcsmail.uk | Existing Mythic Beasts VPS |
+| migration/mythic-web-hosting | https://mbbb-preview.dcsmail.uk | Mythic Beasts Web 25, Bobcat |
 
-This README records the implementation and decisions discussed during development. It is not an audit of the current deployed files. Local edits, GitHub and the demo may temporarily differ.
+The real domain has not yet been switched. Pages CMS edits whichever branch is selected;
+changes do not automatically cross branches. During preview tests select the migration branch.
+The image-filename spaces fix currently belongs to the migration branch; main may reject
+published photo records with spaces until that fix is separately applied or migration completes.
 
-## Approach and status
+The historical tag `vps-before-hosting-migration` marks the pre-migration code. Git history
+is not a backup of server-only credentials, configuration or received emails.
 
-The website uses HTML, CSS and browser JavaScript. Preserve its existing logo, photographs and visual identity; no WordPress, database or frontend framework is planned.
+## Working features
 
-- Shared header and footer are loaded from HTML includes.
-- The default design uses the pink accent with generic CSS class names. Gold remains an optional alternative design.
-- Gigs and testimonials are read from individual YAML files through JSON filename manifests.
-- The gigs page separates upcoming and past performances; the homepage displays up to three upcoming gigs.
-- The homepage rotates featured testimonials and links to individual testimonials on the full page.
-- A reusable page template provides consistent introductions and content styling.
-- Privacy and website terms content has been drafted; outstanding placeholders and operating details need confirmation before production.
-- A Pages CMS account has been created. CMS configuration, editor invitations and automated publication remain planned.
-- The contact form currently uses `mailto:`. Its server-side replacement has been prepared and locally tested; VPS installation and live delivery testing remain outstanding. See `server/contact/INSTALL.md`.
+- Shared header/footer loaded by js/includes.js; menu styles in css/menu-styles.css.
+- Gigs and testimonials are individual YAML records, with generated JSON manifests.
+- Homepage shows up to three upcoming gigs and one featured testimonial without rotation.
+- Gallery order is randomised; selected published photographs can be chosen for the homepage.
+- Pages CMS commits trigger content validation, packaging, SSH publication and HTTPS verification.
+- Immutable content releases are switched together using a current symlink.
+- Old releases are cleaned up only after successful verification.
+- Bobcat contact form uses PHP 8.4 and PHPMailer SMTP; email receipt has been confirmed.
 
-## Key files
-
-The following are the relevant paths used in the development work, rather than an exhaustive repository listing:
+## Content and code
 
 | Path | Purpose |
 | --- | --- |
-| `index.html` | Homepage |
-| `page-template.html` | Starting point for additional pages |
-| `privacy.html`, `terms.html` | Privacy notice and website terms |
-| `includes/header.html`, `includes/footer.html` | Shared site navigation and footer |
-| `css/styles.css` | Main styles, typography, components and page layouts |
-| `css/menu-styles.css` | Desktop and mobile menu styles |
-| `assets/` | Logo, photographs and other assets |
-| `js/includes.js` | Loads includes and initialises the mobile menu |
-| `js/gigs.js` | Shared YAML loading, validation and gig rendering |
-| `js/featured-testimonials.js` | Featured homepage testimonial rotation |
-| `gigs/index.html` | Upcoming and historical gig listings |
-| `gigs/gigs.json` | List of gig YAML filenames |
-| `gigs/*.yml` | Individual gig records |
-| `testimonials/index.html` | Full testimonial listings |
-| `testimonials/testimonials.json` | List of testimonial YAML filenames |
-| `testimonials/*.yml` | Individual testimonial records |
-| `deploy.sh` | Manual static website deployment |
-
-The testimonials page also loads its full-list rendering JavaScript; retain the script path used in that page.
+| .pages.yml | CMS collection and media configuration |
+| gigs/*.yml | Gig records |
+| testimonials/*.yml | Testimonial records |
+| gallery/photos/*.yml | Photo metadata |
+| assets/gallery/ | Uploaded photographs |
+| gigs/gigs.json | Generated gig filename manifest |
+| testimonials/testimonials.json | Generated testimonial filename manifest |
+| gallery/photos.json | Generated photo records |
+| js/content-source.js | Local paths versus published release selection |
+| scripts/build-content.mjs | Validate gigs/testimonials and generate or stage manifests |
+| scripts/build-gallery.mjs | Validate photo records and generate or stage gallery |
+| scripts/package-content.py | Package staged text and image files |
+| server/mbbb-publish-content | Restricted receiver and release cleanup |
+| .github/workflows/deploy-content.yml | Branch-specific automatic content publication |
+| api/contact.php | Public PHP entry point on Bobcat |
+| server/contact-php/ | Private PHP handler, Composer files and placeholder configuration |
+| js/contact.js | JSON submission to the form action |
+| deploy-preview.sh | Manual static deployment to Bobcat |
+| deploy.sh | Legacy VPS static deployment; retain during migration |
 
 ## Local development
 
-1. Open the repository folder in VS Code.
-2. Start Live Server from the repository root.
-3. Browse the homepage and `/gigs/` and `/testimonials/` pages.
-4. Check the browser console and Network tab when content fails to load.
-
-Use HTTP through Live Server, not `file://`: the includes, JSON manifests and YAML records are fetched by JavaScript. Root-relative paths such as `/css/styles.css`, `/assets/logo.png` and `/includes/header.html` allow pages in subfolders to load the same resources.
-
-The YAML-based pages load js-yaml before their rendering scripts:
-
-```html
-<script defer src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.1/dist/js-yaml.min.js"></script>
-<script defer src="/js/gigs.js"></script>
-```
-
-Load the parser only once on a page. If a script produces a MIME-type error mentioning HTML, check that its path points to an actual JavaScript file rather than a missing-file response.
-
-Live Server previews the static website. It will not run the planned Python contact endpoint; testing that endpoint will need the backend and a suitable same-origin route.
-
-## Shared page layout
-
-Use the shared include placeholders:
-
-```html
-<body id="top">
-  <div id="site-header"></div>
-  <main>
-    <!-- Page content -->
-  </main>
-  <div id="site-footer"></div>
-  <script src="/js/includes.js"></script>
-</body>
-```
-
-Initialise menu event listeners after the header include has loaded. The mobile menu keeps the booking link visible and closes when a navigation link is selected.
-
-Inner pages use `.page-header`, `.eyebrow`, `.page-intro`, `.page-divider` and `.page-content`. The shared page introduction uses a pink eyebrow and a wide, thin pink divider. The earlier short decorative line above the eyebrow was removed.
-
-Use `href="#top"` for the current page's back-to-top link and `href="/#about"` for a homepage section from another page. IDs must be unique within each page. Footer links to legal pages should be root-relative (`/privacy.html` and `/terms.html`).
-
-## Gig content
-
-Store one gig per YAML file in `gigs/`, preferably named `YYYY-MM-DD-gig-name.yml`. Add its exact filename to `gigs/gigs.json`. The manifest is currently maintained manually; folder contents are not discovered automatically by the browser.
-
-### Fields
-
-| Field | Required for publication | Format |
-| --- | --- | --- |
-| `title` | Yes | Text |
-| `date` | Yes | Quoted valid date: `"YYYY-MM-DD"` |
-| `start_time` | Yes | Text, including wording such as doors and performance times |
-| `venue` | Yes | Text |
-| `location` | No | Address or location text |
-| `running_time` | No | Text |
-| `description` | No | Plain text; blank lines separate paragraphs |
-| `ticket_url` | No | Full HTTP/HTTPS URL, without Markdown link syntax |
-| `ticket_price` | No | Text, including any fees or door prices |
-| `published` | Yes | Boolean `true` or `false`, without quotes |
-
-Example structure (illustrative, not a real listing):
-
-```yaml
-title: "Example concert"
-date: "2027-06-12"
-start_time: "Doors open at 19.15, music at 19.45"
-venue: "Example Hall"
-location: "Example Hall, Example Town"
-running_time: "Approximately 2 hours including an interval"
-description: |-
-  The first paragraph of the event description.
-
-  A second paragraph with more details.
-ticket_url: ""
-ticket_price: "To be confirmed"
-published: false
-```
-
-Keep the block text indented using spaces, starting on the line after `description: |-`. Descriptions are rendered as plain text, so Markdown asterisks are not converted to emphasis.
-
-### Display rules
-
-- YAML values are the source of truth, not filenames or old HTML cards.
-- Only records with `published: true` are displayed. Unpublished drafts can be incomplete.
-- Dates are compared against today's calendar date in `Europe/London`.
-- Today's gigs remain upcoming until the end of the day.
-- Upcoming gigs are ordered by date ascending; historical gigs by date descending.
-- The homepage takes the first three upcoming gigs and shows title, venue and start-time information.
-- Homepage title and arrow links point to the individual gig on `/gigs/` using a filename-derived anchor.
-- The full page includes optional details only when present and preserves description paragraphs.
-- Upcoming gigs without a ticket URL display “Tickets coming soon”. This currently applies to all upcoming gigs without a URL, including free or pay-on-the-door events; refine the rule if needed.
-- Past gigs retain their details but do not show a ticket-purchase link or “Tickets coming soon”.
-
-Renaming a YAML file changes its anchor and can break previously shared links. Keep historical records for the archive rather than deleting them when the date passes.
-
-### Validation and failures
-
-The shared loader checks required fields, real dates, optional field types, URLs, Boolean publication flags and the filename manifest. It uses text nodes to render content rather than interpreting YAML values as HTML.
-
-The current browser loader treats a missing or malformed published record as a failed load and displays an error message. It does not retain a previous successful content snapshot. Inspect the browser console for details. Build-time validation and preserving the last successful deployment are planned for automatic publishing.
-
-## Testimonial content
-
-Store individual records in `testimonials/` and list their filenames in `testimonials/testimonials.json`. Use readable date-and-name filenames and avoid renaming published files unnecessarily because individual testimonial links use filename-derived anchors.
-
-The content model uses `reviewer`, `review_text`, `date`, `source`, `featured` and `published`. The `source` field is currently used for event type or source information. Keep dates valid; do not use a day of `00`. If the original review date is unknown, an agreed creation date can be used, but do not present it as a known event date.
-
-Use a YAML literal block for paragraphs:
-
-```yaml
-reviewer: "Example reviewer"
-review_text: |-
-  First paragraph of the testimonial.
-
-  Second paragraph of the testimonial.
-date: "2026-10-21"
-source: "Wedding"
-featured: true
-published: false
-```
-
-The full page displays published testimonials with paragraphs, attribution and metadata. The homepage selects published, featured testimonials and displays their first paragraph, attribution, a link to the exact testimonial and a link to all testimonials.
-
-The agreed rotation interval is five seconds, with pause controls and hover/focus pausing. Keep an explicit pause control available for touch and keyboard users. The later presentation decision removed the added ellipsis from the excerpt.
-
-Only public-facing content belongs in this public repository. Keep private correspondence and testimonial permission records elsewhere.
-
-## Manual deployment
-
-Run these commands from the local repository directory:
+Use Node 24 to match Actions. From the repository root:
 
 ```bash
-ssh -MNf mbbb
-./deploy.sh
+npm ci --ignore-scripts
+npm run content:test
+npm run content:build
+node scripts/build-gallery.mjs
 ```
 
-The first command opens the SSH multiplexed connection required by the current deployment script. The script deploys static files using rsync to `/srv/www/mbbb/` as the non-sudo `websites` user.
+Start VS Code Live Server from this root. Use localhost or 127.0.0.1; do not use file://.
+The local content loader uses the local manifests. A git pull downloads CMS YAML/images;
+rerun the builders to refresh local manifests. Manifest changes may then appear in git status.
+Do not manually maintain filename lists.
 
-The script uses `rsync --delete`: destination files absent from the deployment source may be removed. Check the destination and exclusions before changing the script. Keep runtime services and secrets outside the website root. Review exclusions so repository metadata, private configuration and future server-side source files are not inadvertently published.
+Live Server cannot execute PHP. Test the contact endpoint on Bobcat. Never copy real SMTP
+credentials into the repository or public website directory.
 
-GitHub commits do not currently replace this manual publishing step. Check the deployed pages after running the script, including nested-page assets, navigation, content loading and ticket links.
+## Content rules
 
-## Planned Pages CMS and automatic publishing
+Gigs require title, date, start_time, venue and a boolean published flag. Optional fields are
+location, running_time, description, ticket_url and ticket_price. Dates must be real calendar
+dates. Descriptions and testimonial review_text support blank-line-separated paragraphs using
+YAML literal blocks. Ticket URLs are plain HTTP/HTTPS URLs, not Markdown links.
 
-Use the hosted Pages CMS service at https://app.pagescms.org/ rather than self-hosting a CMS. An account has been created.
+Testimonials use reviewer, review_text, date/source metadata, featured and published; consult
+.pages.yml for the current full form. Homepage excerpts link to filename-derived anchors.
+Renaming a record can break its previously shared anchor links.
 
-Initial scope:
+Photo records use title, image, caption (CMS Description), optional photographer,
+use_on_homepage and published. The generated alternative text uses description, then legacy
+alt text, then title. Choose descriptions that meaningfully describe the photograph.
+Both published and use_on_homepage must be true for homepage selection.
 
-- Gigs and Testimonials collections with structured fields.
-- One DCS administrator and up to three band editors.
-- No layout editing, WYSIWYG page editing or collection-level role restrictions.
-- Editors' saved changes should publish automatically without administrator approval.
+Photos must be JPG/JPEG, PNG or WebP directly inside assets/gallery. The migration branch
+accepts letters, digits, underscores, dots, hyphens and ordinary spaces, starting with a letter
+or digit. Each published image is limited to 5 MiB; the encoded publication bundle to 32 MiB.
+Resize/compress large originals before uploading. Uploaded but unreferenced images are not
+included in the published bundle. Unpublished content is omitted from publication but remains
+visible in this public Git repository: never store confidential material here.
 
-Still to implement:
+## Git and Pages CMS
 
-1. Add `.pages.yml` matching the agreed fields and existing content paths.
-2. Test creating, updating, unpublishing and deleting records.
-3. Generate filename manifests automatically as part of publication.
-4. Validate all publishable content before deploying.
-5. Configure GitHub Actions and narrowly scoped deployment credentials stored as GitHub secrets.
-6. Design content-only deployment so it cannot delete unrelated site files or conflict with manual deployment.
-7. Ensure validation or deployment failure leaves the last successful published content available.
-8. Invite editors and document the editing workflow.
+Before editing locally:
 
-The final workflow and deployment strategy remain to be implemented and tested. Do not assume a `.pages.yml` file or GitHub Actions publishing workflow already exists.
-
-## Contact form implementation
-
-Status: source files prepared and locally tested with mocked SMTP. Not yet installed on the VPS or tested for real delivery. Follow `server/contact/INSTALL.md`.
-
-Replace the current `mailto:` form with a small Python handler using built-in SMTP support. No database or additional email service is planned.
-
-Browser JavaScript will submit to `/api/contact`. Caddy will forward that route to a handler listening on loopback only, running under an unprivileged account as a systemd service. The proposed local port is 8011; check it is free before installation.
-
-## Demo email behaviour
-
-Use the existing dedicated Mythic Beasts mailbox for both sending and receiving demo enquiries:
-
-```text
-From: MBBB Website <mbbb@dcsmail.uk>
-To: mbbb@dcsmail.uk
-Reply-To: the visitor's validated email address
-Subject prefix: MBBB Demo Enquiry
+```bash
+git fetch origin
+git status
 ```
 
-Do not send demo enquiries to the band's production enquiries address. The recipient and sender must come from server configuration, not browser-submitted fields.
+With a clean working tree and no local-only commits, use git pull --ff-only. If local and
+remote commits have diverged, review them, then rebase local unpublished commits onto the
+remote branch. Stop and resolve conflicts explicitly. Do not force-push to solve CMS divergence.
 
-### Proposed VPS files
+To bring main content into the migration branch, fetch and merge origin/main while on the
+migration branch, review conflicts, rebuild content and commit generated manifest changes.
+Review test records and preserve Bobcat-specific deployment settings. Do not merge the
+migration branch into main until the workflow trigger and production destination are prepared.
 
-| File | Purpose |
+## Manual static deployment to Bobcat
+
+From the local repository on the migration branch:
+
+```bash
+./deploy-preview.sh --dry-run
+./deploy-preview.sh
+```
+
+Target: dcshosting@bobcat.mythic-beasts.com
+Document root: /home/dcshosting/www/mbbb-preview.dcsmail.uk/
+
+This script uploads HTML, CSS, JavaScript, the public PHP entry point and static assets.
+It neither generates manifests nor deploys CMS records, CMS images, private server code or
+credentials. It deliberately does not delete remote files during migration. Remove obsolete
+remote files only after reviewing explicit paths. Actions does not deploy these static files.
+
+The legacy deploy.sh targets /srv/www/mbbb on the VPS and requires ssh -MNf mbbb. It uses
+rsync --delete; do not retarget it casually. Consolidate deployment scripts at cutover.
+
+## Bobcat content publication
+
+| Server path | Purpose |
 | --- | --- |
-| `/opt/mbbb-contact/contact.py` | Python form handler |
-| `/etc/mbbb-contact.env` | Private email configuration |
-| `/etc/systemd/system/mbbb-contact.service` | Service definition |
+| /home/dcshosting/bin/mbbb-publish-content | Installed receiver, mode 700 |
+| /home/dcshosting/mbbb-content/releases/ | Complete immutable content releases |
+| /home/dcshosting/mbbb-content/current | Symlink to active release |
+| /home/dcshosting/mbbb-content/current.json | Symlink to current/release.json |
+| /home/dcshosting/mbbb-content/.htaccess | Cache-Control: no-store for release pointer |
+| /home/dcshosting/www/mbbb-preview.dcsmail.uk/content | Symlink to private-parent content directory |
 
-These paths are outside the static website root and therefore outside its current `rsync --delete` deployment target. The handler and its service will need a separate installation/update step.
+Content in mbbb-content is publicly served through that link; it must contain no secrets.
+The receiver is outside that directory. A forced-command SSH key restricts automated access.
 
-### Email configuration
+Migration Actions uses BOBCAT_SSH_HOST, BOBCAT_SSH_PORT, BOBCAT_SSH_USER,
+BOBCAT_SSH_PRIVATE_KEY and BOBCAT_SSH_KNOWN_HOSTS. Existing MBBB_SSH_* secrets support
+main/VPS. Never replace host-key verification with StrictHostKeyChecking=no.
 
-Proposed contents of `/etc/mbbb-contact.env`:
+Workflow: test, stage, package, check latest branch commit, publish, verify every text/image
+file over HTTPS, then cleanup. Validation failures leave the old release active. HTTPS
+verification happens after activation; a verification failure does not automatically roll back.
 
-```ini
-SMTP_HOST=smtp-auth.mythic-beasts.com
-SMTP_PORT=587
-SMTP_USERNAME=mbbb@dcsmail.uk
-SMTP_PASSWORD=replace-with-mailbox-password
+Cleanup retains the active release, five newest releases by sequence, and everything less than
+seven days old. It shares the publication lock. Deleted releases are listed in the Actions log.
+Run a non-deleting preview on Bobcat with:
 
-MAIL_FROM=mbbb@dcsmail.uk
-MAIL_TO=mbbb@dcsmail.uk
-MAIL_SUBJECT_PREFIX="MBBB Demo Enquiry"
-PUBLIC_ORIGIN=https://mbbb.dcsmail.uk
-CONTACT_PORT=8011
+```bash
+SSH_ORIGINAL_COMMAND=cleanup-preview ~/bin/mbbb-publish-content
 ```
 
-The service will load this file using systemd's `EnvironmentFile` setting. The Python handler will read the resulting environment variables. Use systemd-compatible quoting for values where needed; this is not a shell script.
+Older releases aid recovery but are not an off-host backup. To restore older content normally,
+revert the relevant content changes in Git and publish a new higher-sequence release. Do not
+reset sequence numbering or point current at an older release casually.
 
-SMTP uses STARTTLS with certificate verification. The authenticated mailbox must be authorised to send from the configured From address.
+Receiver changes require a separate upload/install into ~/bin; neither static deployment nor
+content Actions installs receiver code. Back up the installed receiver before replacing it.
 
-Keep the real configuration outside GitHub and the web root. Restrict access, for example by making it root-owned with mode `0600` when systemd loads it. Never put the password in HTML, browser JavaScript, logs or this README. A placeholder-only configuration example may be kept in the repository.
+## PHP contact handler
 
-Mythic Beasts documentation:
+Public endpoint: /api/contact.php. JavaScript reads form.action. The private installation is
+/home/dcshosting/mbbb-contact/ and contains handler.php, config.json, composer.json,
+composer.lock, vendor/ and state/. The directory and state directory are mode 700;
+config.json is mode 600. The actual config is never committed. Commit composer.lock for
+reproducible dependency versions; do not commit vendor or state.
 
-- SMTP settings: https://www.mythic-beasts.com/support/hosting/mail/client
-- Sender restrictions: https://www.mythic-beasts.com/support/hosting/mail/sender-restrictions
+Bobcat's default CLI PHP is 7.4; always use /usr/bin/php8.4 for this application.
+Composer is installed at /home/dcshosting/bin/composer.phar. After updating dependency files:
 
-### Form behaviour
+```bash
+cd ~/mbbb-contact
+/usr/bin/php8.4 ~/bin/composer.phar install --no-dev --prefer-dist --no-interaction --no-plugins --no-scripts --optimize-autoloader
+/usr/bin/php8.4 ~/bin/composer.phar check-platform-reqs --no-dev
+/usr/bin/php8.4 -l handler.php
+```
 
-Retain the existing enquiry fields: first name, last name, email address, event date, event type and message.
+Private configuration keys: PUBLIC_ORIGIN, SMTP_HOST, SMTP_PORT, SMTP_USERNAME,
+SMTP_PASSWORD, MAIL_FROM, MAIL_TO, MAIL_SUBJECT_PREFIX and RATE_LIMIT_SECRET.
+The current preview origin is https://mbbb-preview.dcsmail.uk. MAIL_TO is the configured
+recipient; confirm it before production. The subject prefix is Website Enquiry from.
+SMTP uses authenticated STARTTLS; visitor email is Reply-To, never From.
 
-The planned handler will:
+The handler validates fields, limits the body to 24,000 bytes, allows five attempts/IP per
+15 minutes and at most three simultaneous SMTP sends. Rate state uses hashed client keys
+and file locks. A filled honeypot returns an error rather than claiming an email was sent.
+Errors preserve form values; SMTP acceptance yields the pink success message and clears
+form fields. Acceptance does not itself guarantee inbox delivery. No database or queue is used.
 
-- Validate required fields and email addresses on the server.
-- Limit request and field sizes and reject invalid input.
-- Check a hidden honeypot field and apply basic rate limiting.
-- Send plain-text email through the configured SMTP server with a finite timeout.
-- Return a clear success or error response without exposing credentials or internal exceptions.
-- Avoid logging enquiry bodies or other unnecessary personal information.
+Private handler changes are not included by deploy-preview.sh. Upload handler.php separately,
+lint with PHP 8.4 and replace the installed file only after a successful lint. No systemd
+restart is needed on Bobcat. Keep the existing VPS service until migration is accepted.
 
-The browser will prevent duplicate submissions while a request is in progress. It will show success only after SMTP accepts the message. SMTP acceptance does not guarantee final inbox delivery.
+## Troubleshooting
 
-On failure, preserve the entered details and offer an email link. Keep a visible direct-contact option for visitors who cannot use the scripted form.
+- Wrong endpoint /api/contact on Bobcat: check form action, JavaScript and browser cache.
+- GET /api/contact.php returning 405 JSON is expected; it does not test SMTP/configuration.
+- A 503 contact response indicates configuration, dependency, storage or availability issues;
+  inspect hosting error logs. Never expose SMTP debugging or private settings in responses.
+- Gallery validation failure: inspect image path, extension, filename characters and sizes.
+- Missing content: inspect /content/current.json and the release-prefixed manifest/image URLs.
+- Successful CMS run but unchanged HTML/JS: static code needs manual deployment.
+- CMS edit goes to wrong host: inspect selected CMS branch and Actions run branch.
 
-There is no planned persistent message queue. A failed submission will need to be retried by the visitor.
+## Remaining before launch
 
-### Switching to production
-
-1. Confirm production hosting supports the handler and `/api/contact` route.
-2. Choose the production sending mailbox and receiving address.
-3. Update SMTP credentials, sender, recipient and subject prefix in the private configuration file.
-4. Check sender authorisation and the sending domain's email authentication configuration.
-5. Restart `mbbb-contact.service` to load the new settings.
-6. Test a submission, delivery to the correct inbox and Reply-To behaviour.
-7. Update any visible demo contact links and the privacy notice to match the production arrangements.
-
-The browser endpoint remains `/api/contact`, so no hostname or SMTP credentials need to be embedded in the JavaScript.
-
-### Implementation checklist
-
-- [x] Prepare the Python handler and automated local checks.
-- [ ] Install the private configuration file on the VPS.
-- [ ] Select a free loopback port and create the systemd service.
-- [ ] Add the Caddy route without affecting other hosted sites.
-- [ ] Replace the form's mailto submission with JavaScript submission.
-- [ ] Test successful delivery and Reply-To.
-- [ ] Test validation, honeypot, rate limiting and sending failures.
-- [ ] Confirm errors preserve form contents and no secrets are exposed.
-- [ ] Record final installation, restart and troubleshooting commands here.
-
-Prepared files are supplied in `server/contact/` and `js/contact.js`. Six backend tests and browser-script success/failure checks passed locally with mocked SMTP. The service, Caddy route and form changes still need installation; no live email has been sent.
-
-
-## Before production
-
-- Confirm the production domain, hosting and mail delivery arrangements.
-- Complete and review the privacy notice and website terms with the band.
-- Check the live site's external resources, privacy disclosures and any analytics or cookie behaviour.
-- Verify gig details, ticket links and testimonial publication permissions.
-- Test mobile navigation, keyboard use, pause controls and anchor links.
-- Complete contact-form delivery and failure tests.
-- Complete CMS/editor testing and safe automatic deployment before relying on it.
+- Remove test gigs and temporary link-test.txt; reconcile latest content from both branches.
+- Decide final hostname and redirects; prepare domain/TLS hosting without altering mail DNS
+  unless a separate email migration is agreed.
+- Update private PUBLIC_ORIGIN and verify sender/recipient, Reply-To and actual delivery.
+- Update workflow branch trigger AND job branch condition for main, production verification
+  URL and destination. Simply merging the current migration-only workflow will not enable main.
+- Consolidate deployment scripts and document separate private-code updates.
+- Review cache behaviour and homepage image failure fallback.
+- Review privacy/terms, image permissions, mobile/keyboard behaviour and production links.
+- Make independent backups of server-only configuration securely; do not rely on releases alone.
+- Merge migration when ready; test main publication and production delivery before retiring VPS.
+- Keep Pages CMS editors on one production branch, then remove the temporary migration branch.

@@ -19,7 +19,7 @@ import sys
 import tempfile
 import time
 
-ROOT = Path('/srv/mbbb-content')
+ROOT = Path('/home/dcshosting/mbbb-content')
 MAX_UPLOAD = 32 * 1024 * 1024
 MAX_IMAGE = 5 * 1024 * 1024
 MAX_FILE = 512 * 1024
@@ -95,7 +95,7 @@ def validate(raw):
             require(photo['published'] is True, 'Gallery contains an unpublished photo')
             require(type(photo['use_on_homepage']) is bool, 'Invalid homepage flag')
             name = photo['file']
-            require(isinstance(name, str) and len(name) <= 200 and re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]*\.(?:jpe?g|png|webp)', name, re.I), 'Invalid image filename')
+            require(isinstance(name, str) and len(name) <= 200 and re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_. -]*\.(?:jpe?g|png|webp)', name, re.I), 'Invalid image filename')
             expected_images.add('assets/gallery/' + name)
         require(set(images) == expected_images, 'Images must exactly match gallery manifest')
         for name, encoded in images.items():
