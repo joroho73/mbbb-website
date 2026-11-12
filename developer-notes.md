@@ -21,7 +21,7 @@ These commands update the local preview. They do not deploy anything.
 
 
 # Deploy files to Margay VPS
-The previous server is deployed to via ssh
+The previous server is deployed to via ssh - note this is due to be deprecated.
 ```
 cd /path-to-project
 ssh -MNf mbbb

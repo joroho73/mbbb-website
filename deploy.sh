@@ -2,28 +2,30 @@
 
 set -euo pipefail
 
-REMOTE="mbbb"
-REMOTE_DIR="/srv/www/mbbb/"
+REMOTE="dcshosting@bobcat.mythic-beasts.com"
+REMOTE_DIR="/home/dcshosting/www/mbbb-preview.dcsmail.uk/"
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-echo "Building gigs and testimonials content..."
-npm run content:build
-
-if ! ssh -O check "$REMOTE" >/dev/null 2>&1; then
-    echo "No active SSH connection for '$REMOTE'."
-    echo
-    echo "Open one with:"
-    echo "  ssh -MNf $REMOTE"
-    exit 1
+case "${1:-}" in
+    "") RSYNC_OPTIONS=() ;;
+    --dry-run) RSYNC_OPTIONS=(--dry-run) ;;
+    *) echo "Usage: ./deploy-preview.sh [--dry-run]" >&2; exit 2 ;;
+esac
+if (( $# > 1 )); then
+    echo "Usage: ./deploy-preview.sh [--dry-run]" >&2
+    exit 2
 fi
 
-echo "Deploying Melvin Beddow Big Band demo website..."
+echo "Deploying static website files to Bobcat preview..."
+echo "CMS content and private PHP configuration are deployed separately."
 
-rsync -avz \
-    --delete \
+rsync -avz "${RSYNC_OPTIONS[@]}" \
+    --itemize-changes \
     --exclude '*.bak' \
+    --exclude '*.tmp' \
+    --exclude '*~' \
     --exclude '*.env' \
     --exclude '*:Zone.Identifier' \
     --exclude '.content-build/' \
@@ -33,6 +35,7 @@ rsync -avz \
     --exclude '.pages.yml' \
     --exclude '.vscode/' \
     --exclude '/assets/gallery/' \
+    --exclude '/content/' \
     --exclude '/gallery/photos/' \
     --exclude '/gallery/photos.json' \
     --exclude '/gallery/photos.generated.json' \
@@ -43,9 +46,11 @@ rsync -avz \
     --exclude '/testimonials/*.yml' \
     --exclude '/testimonials/testimonials.json' \
     --exclude 'README.md' \
+    --exclude '/INSTALL.md' \
     --exclude '__pycache__/' \
-    --exclude 'deploy-command.txt' \
+    --exclude 'developer-notes.md' \
     --exclude 'deploy.sh' \
+    --exclude 'deploy-preview.sh' \
     --exclude 'node_modules/' \
     --exclude 'package-lock.json' \
     --exclude 'package.json' \
@@ -55,5 +60,9 @@ rsync -avz \
     ./ "$REMOTE:$REMOTE_DIR"
 
 echo
-echo "Deployment complete."
-echo "https://mbbb.dcsmail.uk"
+if [[ "${1:-}" == "--dry-run" ]]; then
+    echo "Preview complete. No files uploaded."
+else
+    echo "Static website deployment complete."
+fi
+echo "https://mbbb-preview.dcsmail.uk"
