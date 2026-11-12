@@ -1,187 +1,203 @@
 # Melvin Beddow Big Band website
 
 Static HTML, CSS and JavaScript website maintained by Dunmow Computer Services.
+
 Repository: https://github.com/joroho73/mbbb-website
 
-Updated 10 November 2026. This describes the migration stage, not a completed production cutover.
+Updated 12 November 2026.
 
-## Environments and branches
+## Hosting and source control
 
-| Branch | Website | Hosting |
-| --- | --- | --- |
-| main | https://mbbb.dcsmail.uk | Existing Mythic Beasts VPS |
-| migration/mythic-web-hosting | https://mbbb-preview.dcsmail.uk | Mythic Beasts Web 25, Bobcat |
+The maintained branch is `main`. Select `main` in Pages CMS.
 
-The real domain has not yet been switched. Pages CMS edits whichever branch is selected;
-changes do not automatically cross branches. During preview tests select the migration branch.
-The image-filename spaces fix currently belongs to the migration branch; main may reject
-published photo records with spaces until that fix is separately applied or migration completes.
+Hosting: Mythic Beasts Web 25, Bobcat  
+Current website: https://mbbb-preview.dcsmail.uk  
+SSH account: `dcshosting@bobcat.mythic-beasts.com`  
+Document root: `/home/dcshosting/www/mbbb-preview.dcsmail.uk/`
 
-The historical tag `vps-before-hosting-migration` marks the pre-migration code. Git history
-is not a backup of server-only credentials, configuration or received emails.
+The migration has been consolidated into `main`. Public-domain cutover and retirement
+of the old MBBB VPS services are separate tasks.
 
-## Working features
+The tag `vps-before-hosting-migration` preserves the earlier implementation.
+Git does not back up server-only credentials or configuration.
 
-- Shared header/footer loaded by js/includes.js; menu styles in css/menu-styles.css.
-- Gigs and testimonials are individual YAML records, with generated JSON manifests.
-- Homepage shows up to three upcoming gigs and one featured testimonial without rotation.
-- Gallery order is randomised; selected published photographs can be chosen for the homepage.
-- Pages CMS commits trigger content validation, packaging, SSH publication and HTTPS verification.
-- Immutable content releases are switched together using a current symlink.
-- Old releases are cleaned up only after successful verification.
-- Bobcat contact form uses PHP 8.4 and PHPMailer SMTP; email receipt has been confirmed.
+## Website and content
 
-## Content and code
+- Shared header and footer are loaded by `js/includes.js`.
+- Gigs and testimonials use individual YAML records and generated JSON manifests.
+- The homepage displays upcoming gigs and a featured testimonial.
+- Published gallery photographs can be selected for random homepage use.
+- The contact form submits to `/api/contact.php`, using a private PHP handler and SMTP.
+- No database is required.
 
 | Path | Purpose |
 | --- | --- |
-| .pages.yml | CMS collection and media configuration |
-| gigs/*.yml | Gig records |
-| testimonials/*.yml | Testimonial records |
-| gallery/photos/*.yml | Photo metadata |
-| assets/gallery/ | Uploaded photographs |
-| gigs/gigs.json | Generated gig filename manifest |
-| testimonials/testimonials.json | Generated testimonial filename manifest |
-| gallery/photos.json | Generated photo records |
-| js/content-source.js | Local paths versus published release selection |
-| scripts/build-content.mjs | Validate gigs/testimonials and generate or stage manifests |
-| scripts/build-gallery.mjs | Validate photo records and generate or stage gallery |
-| scripts/package-content.py | Package staged text and image files |
-| server/mbbb-publish-content | Restricted receiver and release cleanup |
-| .github/workflows/deploy-content.yml | Branch-specific automatic content publication |
-| api/contact.php | Public PHP entry point on Bobcat |
-| server/contact-php/ | Private PHP handler, Composer files and placeholder configuration |
-| js/contact.js | JSON submission to the form action |
-| deploy-preview.sh | Manual static deployment to Bobcat |
-| deploy.sh | Legacy VPS static deployment; retain during migration |
+| `.pages.yml` | Pages CMS configuration |
+| `gigs/` | Gig records and generated manifest |
+| `testimonials/` | Testimonial records and generated manifest |
+| `gallery/photos/` | Photo metadata |
+| `assets/gallery/` | Uploaded photographs |
+| `gallery/photos.json` | Generated gallery manifest |
+| `scripts/build-content.mjs` | Gig/testimonial validation and generation |
+| `scripts/build-gallery.mjs` | Gallery validation and generation |
+| `scripts/package-content.py` | Publication package builder |
+| `server/mbbb-publish-content` | Content receiver and release cleanup |
+| `.github/workflows/deploy-content.yml` | Automatic content publication |
+| `api/contact.php` | Public contact endpoint |
+| `server/contact-php/` | Private PHP source and Composer dependencies |
+| `deploy.sh` | Manual static deployment |
 
-## Local development
+## Pull and rebuild locally
 
-Use Node 24 to match Actions. From the repository root:
+Start with a clean working tree:
 
 ```bash
+git switch main
+git pull --ff-only
 npm ci --ignore-scripts
 npm run content:test
 npm run content:build
 node scripts/build-gallery.mjs
 ```
 
-Start VS Code Live Server from this root. Use localhost or 127.0.0.1; do not use file://.
-The local content loader uses the local manifests. A git pull downloads CMS YAML/images;
-rerun the builders to refresh local manifests. Manifest changes may then appear in git status.
-Do not manually maintain filename lists.
+Use Node 24 to match the build configuration.
 
-Live Server cannot execute PHP. Test the contact endpoint on Bobcat. Never copy real SMTP
-credentials into the repository or public website directory.
+Pages CMS commits YAML and images. Actions builds manifests for deployment without
+committing them back to GitHub. Rebuild locally after pulling CMS changes.
 
-## Content rules
+Generated manifests are tracked, so rebuilding may produce local changes.
+Review these before committing. Do not edit the manifests manually.
 
-Gigs require title, date, start_time, venue and a boolean published flag. Optional fields are
-location, running_time, description, ticket_url and ticket_price. Dates must be real calendar
-dates. Descriptions and testimonial review_text support blank-line-separated paragraphs using
-YAML literal blocks. Ticket URLs are plain HTTP/HTTPS URLs, not Markdown links.
+If Git reports divergent branches, review the local and remote commits before
+merging or rebasing. Do not force-push to resolve CMS changes.
 
-Testimonials use reviewer, review_text, date/source metadata, featured and published; consult
-.pages.yml for the current full form. Homepage excerpts link to filename-derived anchors.
-Renaming a record can break its previously shared anchor links.
+Start VS Code Live Server from the repository root. Live Server cannot execute PHP;
+test the contact form on Bobcat.
 
-Photo records use title, image, caption (CMS Description), optional photographer,
-use_on_homepage and published. The generated alternative text uses description, then legacy
-alt text, then title. Choose descriptions that meaningfully describe the photograph.
-Both published and use_on_homepage must be true for homepage selection.
+## Editing content
 
-Photos must be JPG/JPEG, PNG or WebP directly inside assets/gallery. The migration branch
-accepts letters, digits, underscores, dots, hyphens and ordinary spaces, starting with a letter
-or digit. Each published image is limited to 5 MiB; the encoded publication bundle to 32 MiB.
-Resize/compress large originals before uploading. Uploaded but unreferenced images are not
-included in the published bundle. Unpublished content is omitted from publication but remains
-visible in this public Git repository: never store confidential material here.
+Use Pages CMS on `main`. Consult `.pages.yml` for current fields and validation.
 
-## Git and Pages CMS
+Photo Description is stored in the required `title` field. Legacy photo records may
+also contain `caption` or `alt`; the builder uses its fallback rules to generate
+captions and alternative text.
 
-Before editing locally:
+Both `published` and `use_on_homepage` must be true for homepage image selection.
 
-```bash
-git fetch origin
-git status
-```
+Upload JPG/JPEG, PNG or WebP images through the configured gallery field.
+Safe filename renaming applies to new uploads, not existing files.
 
-With a clean working tree and no local-only commits, use git pull --ff-only. If local and
-remote commits have diverged, review them, then rebase local unpublished commits onto the
-remote branch. Stop and resolve conflicts explicitly. Do not force-push to solve CMS divergence.
+Published images are limited to 5 MiB each, and the encoded publication package to
+32 MiB. Resize large originals before uploading.
 
-To bring main content into the migration branch, fetch and merge origin/main while on the
-migration branch, review conflicts, rebuild content and commit generated manifest changes.
-Review test records and preserve Bobcat-specific deployment settings. Do not merge the
-migration branch into main until the workflow trigger and production destination are prepared.
+Unreferenced images are omitted from the publication package. Draft content remains
+in the public Git repository even though it is omitted from the website.
+Never store confidential information in this repository.
 
-## Manual static deployment to Bobcat
+## Static deployment
 
-From the local repository on the migration branch:
+Run locally:
 
 ```bash
-./deploy-preview.sh --dry-run
-./deploy-preview.sh
+./deploy.sh --dry-run
+./deploy.sh
 ```
 
-Target: dcshosting@bobcat.mythic-beasts.com
-Document root: /home/dcshosting/www/mbbb-preview.dcsmail.uk/
+Review the dry run before uploading.
 
-This script uploads HTML, CSS, JavaScript, the public PHP entry point and static assets.
-It neither generates manifests nor deploys CMS records, CMS images, private server code or
-credentials. It deliberately does not delete remote files during migration. Remove obsolete
-remote files only after reviewing explicit paths. Actions does not deploy these static files.
+Static deployment uploads website code and static assets. CMS content is published
+separately by Actions. Private PHP configuration, dependencies, receiver code and
+development files must remain excluded.
 
-The legacy deploy.sh targets /srv/www/mbbb on the VPS and requires ssh -MNf mbbb. It uses
-rsync --delete; do not retarget it casually. Consolidate deployment scripts at cutover.
+Changes to HTML, CSS or JavaScript require static deployment; content publication
+alone does not deploy them.
 
-## Bobcat content publication
+## Automatic content publication
 
-| Server path | Purpose |
+Changes on `main` trigger `.github/workflows/deploy-content.yml`.
+
+The workflow tests and validates content, builds a package, checks whether the commit
+is still current, publishes through restricted SSH, verifies text over HTTPS, and
+then cleans up old releases.
+
+HTTPS image verification is intentionally skipped. Check new photographs visually
+on the website.
+
+The workflow uses these GitHub secrets:
+
+- `BOBCAT_SSH_HOST`
+- `BOBCAT_SSH_PORT`
+- `BOBCAT_SSH_USER`
+- `BOBCAT_SSH_PRIVATE_KEY`
+- `BOBCAT_SSH_KNOWN_HOSTS`
+
+Keep SSH host-key verification enabled.
+
+| Bobcat path | Purpose |
 | --- | --- |
-| /home/dcshosting/bin/mbbb-publish-content | Installed receiver, mode 700 |
-| /home/dcshosting/mbbb-content/releases/ | Complete immutable content releases |
-| /home/dcshosting/mbbb-content/current | Symlink to active release |
-| /home/dcshosting/mbbb-content/current.json | Symlink to current/release.json |
-| /home/dcshosting/mbbb-content/.htaccess | Cache-Control: no-store for release pointer |
-| /home/dcshosting/www/mbbb-preview.dcsmail.uk/content | Symlink to private-parent content directory |
+| `~/bin/mbbb-publish-content` | Installed restricted receiver |
+| `~/mbbb-content/releases/` | Immutable content releases |
+| `~/mbbb-content/current` | Active-release symlink |
+| `~/mbbb-content/current.json` | Link to active release metadata |
+| `~/www/mbbb-preview.dcsmail.uk/content` | Public content symlink |
 
-Content in mbbb-content is publicly served through that link; it must contain no secrets.
-The receiver is outside that directory. A forced-command SSH key restricts automated access.
+The content directory is publicly accessible through the website. Store no secrets
+there.
 
-Migration Actions uses BOBCAT_SSH_HOST, BOBCAT_SSH_PORT, BOBCAT_SSH_USER,
-BOBCAT_SSH_PRIVATE_KEY and BOBCAT_SSH_KNOWN_HOSTS. Existing MBBB_SSH_* secrets support
-main/VPS. Never replace host-key verification with StrictHostKeyChecking=no.
+Validation failures prevent publication. HTTPS verification takes place after
+activation: a verification failure does not automatically roll back published content.
 
-Workflow: test, stage, package, check latest branch commit, publish, verify every text/image
-file over HTTPS, then cleanup. Validation failures leave the old release active. HTTPS
-verification happens after activation; a verification failure does not automatically roll back.
+A failed workflow can therefore leave the new content visible. Inspect the failed
+step before retrying. If a newer publication succeeds, an older failed run normally
+does not need rerunning.
 
-Cleanup retains the active release, five newest releases by sequence, and everything less than
-seven days old. It shares the publication lock. Deleted releases are listed in the Actions log.
-Run a non-deleting preview on Bobcat with:
+## Release cleanup and recovery
+
+Cleanup runs after successful verification. It retains:
+
+- The active release.
+- The five newest releases by sequence.
+- All releases less than seven days old.
+
+Removed releases are listed in the Actions log.
+
+Preview cleanup on Bobcat without deleting anything:
 
 ```bash
 SSH_ORIGINAL_COMMAND=cleanup-preview ~/bin/mbbb-publish-content
 ```
 
-Older releases aid recovery but are not an off-host backup. To restore older content normally,
-revert the relevant content changes in Git and publish a new higher-sequence release. Do not
-reset sequence numbering or point current at an older release casually.
+To restore previous content, revert the relevant content changes in Git and publish
+a new release. Preserve publication sequence numbering.
 
-Receiver changes require a separate upload/install into ~/bin; neither static deployment nor
-content Actions installs receiver code. Back up the installed receiver before replacing it.
+For static-code recovery, restore the desired version from Git and redeploy it.
+
+Keep secure, independent backups of private configuration and installed server code.
+Old releases and Git history do not replace those backups.
+
+Receiver updates require a separate installation into `~/bin/mbbb-publish-content`.
+Neither static deployment nor content publication installs receiver changes.
 
 ## PHP contact handler
 
-Public endpoint: /api/contact.php. JavaScript reads form.action. The private installation is
-/home/dcshosting/mbbb-contact/ and contains handler.php, config.json, composer.json,
-composer.lock, vendor/ and state/. The directory and state directory are mode 700;
-config.json is mode 600. The actual config is never committed. Commit composer.lock for
-reproducible dependency versions; do not commit vendor or state.
+Public endpoint: `/api/contact.php`
 
-Bobcat's default CLI PHP is 7.4; always use /usr/bin/php8.4 for this application.
-Composer is installed at /home/dcshosting/bin/composer.phar. After updating dependency files:
+Private installation: `/home/dcshosting/mbbb-contact/`
+
+This contains:
+
+- `handler.php`
+- `config.json`
+- `composer.json` and `composer.lock`
+- `vendor/`
+- `state/`
+
+The private directory and state directory use mode `700`; `config.json` uses `600`.
+Never commit real configuration, `vendor/` or rate-limit state.
+
+`composer.lock` is committed for reproducible dependency installation.
+
+After copying updated Composer files into the private directory, run on Bobcat:
 
 ```bash
 cd ~/mbbb-contact
@@ -190,44 +206,39 @@ cd ~/mbbb-contact
 /usr/bin/php8.4 -l handler.php
 ```
 
-Private configuration keys: PUBLIC_ORIGIN, SMTP_HOST, SMTP_PORT, SMTP_USERNAME,
-SMTP_PASSWORD, MAIL_FROM, MAIL_TO, MAIL_SUBJECT_PREFIX and RATE_LIMIT_SECRET.
-The current preview origin is https://mbbb-preview.dcsmail.uk. MAIL_TO is the configured
-recipient; confirm it before production. The subject prefix is Website Enquiry from.
-SMTP uses authenticated STARTTLS; visitor email is Reply-To, never From.
+Use `/usr/bin/php8.4` explicitly; the default CLI PHP may differ from the website's
+configured version.
 
-The handler validates fields, limits the body to 24,000 bytes, allows five attempts/IP per
-15 minutes and at most three simultaneous SMTP sends. Rate state uses hashed client keys
-and file locks. A filled honeypot returns an error rather than claiming an email was sent.
-Errors preserve form values; SMTP acceptance yields the pink success message and clears
-form fields. Acceptance does not itself guarantee inbox delivery. No database or queue is used.
+Private settings include the permitted website origin, SMTP credentials, sender,
+recipient and rate-limit secret. Use `config.example.json` as the reference.
 
-Private handler changes are not included by deploy-preview.sh. Upload handler.php separately,
-lint with PHP 8.4 and replace the installed file only after a successful lint. No systemd
-restart is needed on Bobcat. Keep the existing VPS service until migration is accepted.
+The handler validates submissions, applies rate limits and sends through authenticated
+SMTP. The visitor's address is Reply-To, not From.
+
+Private handler updates require a separate upload and PHP syntax check before replacing
+the installed handler. No systemd restart is required on Bobcat.
+
+Confirm actual email receipt after contact configuration changes.
 
 ## Troubleshooting
 
-- Wrong endpoint /api/contact on Bobcat: check form action, JavaScript and browser cache.
-- GET /api/contact.php returning 405 JSON is expected; it does not test SMTP/configuration.
-- A 503 contact response indicates configuration, dependency, storage or availability issues;
-  inspect hosting error logs. Never expose SMTP debugging or private settings in responses.
-- Gallery validation failure: inspect image path, extension, filename characters and sizes.
-- Missing content: inspect /content/current.json and the release-prefixed manifest/image URLs.
-- Successful CMS run but unchanged HTML/JS: static code needs manual deployment.
-- CMS edit goes to wrong host: inspect selected CMS branch and Actions run branch.
+- Local content missing: pull and rebuild both sets of manifests.
+- Gallery validation fails: inspect the YAML fields, image path, filename and size.
+- Published content missing: inspect `/content/current.json` and its release URLs.
+- HTML or JavaScript unchanged: deploy static files and refresh the browser cache.
+- Contact request goes to `/api/contact`: check form action and cached JavaScript.
+- GET `/api/contact.php` returns 405: expected; this does not test SMTP.
+- Contact returns 503: inspect hosting error logs without exposing private settings.
+- HTTPS verification reports a network error: inspect whether publication succeeded
+  and whether a newer run has already completed successfully.
 
-## Remaining before launch
+## Remaining launch and retirement work
 
-- Remove test gigs and temporary link-test.txt; reconcile latest content from both branches.
-- Decide final hostname and redirects; prepare domain/TLS hosting without altering mail DNS
-  unless a separate email migration is agreed.
-- Update private PUBLIC_ORIGIN and verify sender/recipient, Reply-To and actual delivery.
-- Update workflow branch trigger AND job branch condition for main, production verification
-  URL and destination. Simply merging the current migration-only workflow will not enable main.
-- Consolidate deployment scripts and document separate private-code updates.
-- Review cache behaviour and homepage image failure fallback.
-- Review privacy/terms, image permissions, mobile/keyboard behaviour and production links.
-- Make independent backups of server-only configuration securely; do not rely on releases alone.
-- Merge migration when ready; test main publication and production delivery before retiring VPS.
-- Keep Pages CMS editors on one production branch, then remove the temporary migration branch.
+- Confirm the final public hostname and configure hosting, DNS, TLS and redirects.
+- Preserve email DNS unless an email migration is separately agreed.
+- Update the private contact origin and workflow verification URL for the final hostname.
+- Check production links, contact delivery, mobile behaviour and image permissions.
+- Back up server-only configuration securely.
+- Retire only MBBB's VPS site, contact service and publishing access.
+- Remove obsolete VPS publishing secrets after confirming they are unused.
+- Leave StayYNA and other VPS sites untouched.
