@@ -10,9 +10,9 @@ Updated 12 November 2026.
 
 The maintained branch is `main`. Select `main` in Pages CMS.
 
-Hosting: Mythic Beasts Web 25, Bobcat  
-Current website: https://mbbb-preview.dcsmail.uk  
-SSH account: `dcshosting@bobcat.mythic-beasts.com`  
+Hosting: Mythic Beasts Web 25, Bobcat
+Current website: https://mbbb-preview.dcsmail.uk
+SSH account: `dcshosting@bobcat.mythic-beasts.com`
 Document root: `/home/dcshosting/www/mbbb-preview.dcsmail.uk/`
 
 The migration has been consolidated into `main`. Public-domain cutover and retirement
