@@ -12,8 +12,8 @@ These commands update the local preview. They do not deploy anything.
 
 # Deploy static files to Bobcat
 ```
-./deploy-preview.sh --dry-run
-./deploy-preview.sh
+./deploy.sh --dry-run
+./deploy.sh
 ```
 
 - CMS content is published separately by GitHub Actions.
