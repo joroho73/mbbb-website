@@ -86,15 +86,6 @@
     "alt": "MBBB - Ruby Robinson Jazz Singer",
     "caption": "MBBB - Ruby Robinson Jazz Singer",
     "photographer": "",
-    "use_on_homepage": true,
-    "published": true
-  },
-  {
-    "title": "Gallery photo 793166268_1458688046315378_7885277181873911809_n.jpg",
-    "file": "793166268_1458688046315378_7885277181873911809_n.jpg",
-    "alt": "alttext",
-    "caption": "alttext",
-    "photographer": "",
     "use_on_homepage": false,
     "published": true
   },
@@ -104,7 +95,7 @@
     "alt": "Melvin Beddow Big Band - Brass Players",
     "caption": "Melvin Beddow Big Band - Brass Players",
     "photographer": "",
-    "use_on_homepage": true,
+    "use_on_homepage": false,
     "published": true
   },
   {
@@ -114,15 +105,6 @@
     "caption": "alttext",
     "photographer": "",
     "use_on_homepage": false,
-    "published": true
-  },
-  {
-    "title": "Gallery photo 798729438_1464521935731989_2720468201928392134_n.jpg",
-    "file": "798729438_1464521935731989_2720468201928392134_n.jpg",
-    "alt": "Melvin Beddow Big Band and Jazz Singer Ruby Robinson",
-    "caption": "Melvin Beddow Big Band and Jazz Singer Ruby Robinson",
-    "photographer": "",
-    "use_on_homepage": true,
     "published": true
   },
   {
@@ -137,10 +119,10 @@
   {
     "title": "Gallery photo 809730072_1468917701959079_4210536471450645655_n.jpg",
     "file": "809730072_1468917701959079_4210536471450645655_n.jpg",
-    "alt": "alttext",
-    "caption": "alttext",
+    "alt": "steve",
+    "caption": "steve",
     "photographer": "",
-    "use_on_homepage": true,
+    "use_on_homepage": false,
     "published": true
   },
   {
@@ -158,7 +140,7 @@
     "alt": "Malvin Beddow Big Band - Trumpet Player reading music",
     "caption": "Malvin Beddow Big Band - Trumpet Player reading music",
     "photographer": "",
-    "use_on_homepage": true,
+    "use_on_homepage": false,
     "published": true
   },
   {
@@ -221,7 +203,7 @@
     "alt": "Melvin Beddow Big Band - Sax Soloist",
     "caption": "Melvin Beddow Big Band - Sax Soloist",
     "photographer": "",
-    "use_on_homepage": true,
+    "use_on_homepage": false,
     "published": true
   },
   {
