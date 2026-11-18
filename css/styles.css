@@ -841,6 +841,25 @@ footer {
   color: var(--paper);
 }
 
+.footer-column.footer-socials > a {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer-socials > a > img {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  filter: brightness(0) invert(1);
+  opacity: 0.65;
+}
+
+.footer-socials > a:is(:hover, :focus-visible) > img {
+  opacity: 1;
+}
+
 .footer-bottom {
   grid-column: 1 / -1;
   border-top: 1px solid rgba(238, 232, 220, 0.1);
