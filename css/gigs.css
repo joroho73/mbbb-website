@@ -202,7 +202,8 @@
 
 /* Responsive layouts belong in the gigs stylesheet. */
 @media (max-width: 950px) {
-  .gigs {
+  .gigs,
+  .gigs-listing-page .gigs {
     grid-template-columns: minmax(0, 1fr);
     gap: 40px;
   }
