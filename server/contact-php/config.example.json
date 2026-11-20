@@ -1,5 +1,5 @@
 {
-  "PUBLIC_ORIGIN": "https://mbbb-preview.dcsmail.uk",
+  "PUBLIC_ORIGIN": "https://www.mbbb.co.uk",
   "SMTP_HOST": "COPY_FROM_EXISTING_VPS_CONFIG",
   "SMTP_PORT": 587,
   "SMTP_USERNAME": "mbbb@dcsmail.uk",
