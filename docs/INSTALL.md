@@ -1,4 +1,4 @@
-# Install the MBBB demo contact form
+# Install the MBBB contact form
 
 The code is prepared and locally tested with mocked SMTP. It has not been installed on the VPS or tested against the real mailbox. No email has been sent during preparation.
 
