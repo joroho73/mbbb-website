@@ -65,4 +65,4 @@ if [[ "${1:-}" == "--dry-run" ]]; then
 else
     echo "Static website deployment complete."
 fi
-echo "https://mbbb-preview.dcsmail.uk"
+echo "https://www.mbbb.co.uk"
