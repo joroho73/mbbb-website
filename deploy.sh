@@ -57,6 +57,7 @@ rsync -avz "${RSYNC_OPTIONS[@]}" \
     --exclude 'page-template.html' \
     --exclude 'scripts/' \
     --exclude 'server/' \
+    --exclude 'sitemap.py' \
     ./ "$REMOTE:$REMOTE_DIR"
 
 echo
